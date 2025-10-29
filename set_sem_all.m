@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 1;  Nely = 1; E = Nelx*Nely;
+Nelx = 2;  Nely = 2; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1; 
 
@@ -31,26 +31,63 @@ Dh=deriv_mat(z);
 X=zeros(N1,E,N1); Y=X;
 e=0; 
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
-    x0 = (-1.0 - (ey-1)/Nely);
-    x1 = (1.0 + (ey-1)/Nely);
-    xe00 = x0 + (x1-x0)*((ex-1)/Nelx);
-    xe10 = x0 + (x1-x0)*(ex/Nelx);
-    x0 = (-1.0 - (ey)/Nely);
-    x1 = (1.0 + (ey)/Nely);
-    xe01 = x0 + (x1-x0)*((ex-1)/Nelx);
-    xe11 = x0 + (x1-x0)*(ex/Nelx);
+    function rb = bottom(r)
+        slope = 0.5;
+        if r <= 0.0
+            rb = [r, -1.0 + slope*(r+1)];
+        else
+            rb = [r, -1.0 + slope - slope*r];
+        end
+        % rb = [1.0*r, -1.0];
+    end
+    function rb = top(r)
+        rb = [2.0*r, 1.0];
+    end
+    function rb = blend(r, s)
+        rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;
+    end
 
-    ye00 = -1.0 + 1.0*((ey-1)/Nely);
-    ye10 = -1.0 + 1.0*((ey-1)/Nely);
-    ye01 = -1.0 + 1.0*((ey)/Nely);
-    ye11 = -1.0 + 1.0*((ey)/Nely);
+    r00 = blend((ex-1)/Nelx*2-1, (ey-1)/Nely*2-1);
+    r10 = blend((ex)/Nelx*2-1, (ey-1)/Nely*2-1);
+    r01 = blend((ex-1)/Nelx*2-1, (ey)/Nely*2-1);
+    r11 = blend((ex)/Nelx*2-1, (ey)/Nely*2-1);
 
+    xe00 = r00(1);  ye00 = r00(2);
+    xe10 = r10(1);  ye10 = r10(2);
+    xe01 = r01(1);  ye01 = r01(2);
+    xe11 = r11(1);  ye11 = r11(2);
     
     X(:,e,:) = (xe00 + (xe10-xe00).*(R+1)/2) .* (-S+1)/2 ...
              + (xe01 + (xe11-xe01).*(R+1)/2) .* (1+S)/2;
     Y(:,e,:) = (ye00 + (ye10-ye00).*(R+1)/2) .* (-S+1)/2 ...
              + (ye01 + (ye11-ye01).*(R+1)/2) .* (1+S)/2;
 end; end;
+% figure; hold on; axis equal;
+% for e = 1:E
+%     % Extract patch for element e
+%     Xe = squeeze(X(:,e,:));
+%     Ye = squeeze(Y(:,e,:));
+%     % Plot grid lines
+%     plot(Xe, Ye, 'k-');           % lines along R
+%     plot(Xe', Ye', 'k-');         % lines along S
+%
+%     node_id = 0;
+%     for j = 1:N1; for i = 1:N1;
+%       node_id = node_id +1;
+%       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%     end;end
+%     xc = mean(Xe(:));
+%     yc = mean(Ye(:));
+%
+%     % add element number
+%     text(xc, yc, num2str(e), ...
+%          'HorizontalAlignment','center', ...
+%          'VerticalAlignment','middle', ...
+%          'FontWeight','bold', ...
+%          'Color','r');
+%
+% end
+% pause;
 % [X,Y]=morph_circ(X,Y);         % Morph mesh
 
 [Grr,Grs,Gss,Bl,Xr,Rx,Jac]=geom_elem(X,Y,Dh,w); % Terms for "A"
@@ -75,4 +112,5 @@ dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 U = 1 + 0*X;   %% Initial conditions
 V = 0 + 0*X; 
 T = 0 + 0*X; 
+end
 
