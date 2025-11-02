@@ -16,11 +16,11 @@ n=0;
 
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
 
-     i0=1; if ex>1; i0=2; 
+     i0=1; if ex>1; i0=2;
         glo_num(1,e,:) = glo_num(N1,e-1,:);
      end;
 
-     j0=1; if ey>1; j0=2; 
+     j0=1; if ey>1; j0=2;
         glo_num(:,e,1) = glo_num(:,e-Nelx,N1);
      end;
 
@@ -31,9 +31,9 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
 
 end; end;
 
-% se_disp(glo_num,'glo_num')
+ se_disp(glo_num,'glo_num')
 
-Q=speye(nL); 
+Q=speye(nL);
 k=0;
 for j=1:N1;
 for e=1:E;

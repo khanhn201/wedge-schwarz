@@ -5,7 +5,7 @@ hdr;    % 2-D SEM multi-element
 
 Nelx = 2;  Nely = 2; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
-N1=N+1; 
+N1=N+1;
 
 
 %% Circular Geometry
@@ -29,7 +29,7 @@ Dh=deriv_mat(z);
 
 [R,S]=ndgrid(z,z);             % Build SEM mesh
 X=zeros(N1,E,N1); Y=X;
-e=0; 
+e=0;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
         slope = 0.5;
@@ -38,7 +38,7 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
         else
             rb = [r, -1.0 + slope - slope*r];
         end
-        % rb = [1.0*r, -1.0];
+        rb = [1.0*r, -1.0];
     end
     function rb = top(r)
         rb = [2.0*r, 1.0];
@@ -56,39 +56,40 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
     xe10 = r10(1);  ye10 = r10(2);
     xe01 = r01(1);  ye01 = r01(2);
     xe11 = r11(1);  ye11 = r11(2);
-    
+
     X(:,e,:) = (xe00 + (xe10-xe00).*(R+1)/2) .* (-S+1)/2 ...
              + (xe01 + (xe11-xe01).*(R+1)/2) .* (1+S)/2;
     Y(:,e,:) = (ye00 + (ye10-ye00).*(R+1)/2) .* (-S+1)/2 ...
              + (ye01 + (ye11-ye01).*(R+1)/2) .* (1+S)/2;
 end; end;
-% figure; hold on; axis equal;
-% for e = 1:E
-%     % Extract patch for element e
-%     Xe = squeeze(X(:,e,:));
-%     Ye = squeeze(Y(:,e,:));
-%     % Plot grid lines
-%     plot(Xe, Ye, 'k-');           % lines along R
-%     plot(Xe', Ye', 'k-');         % lines along S
-%
-%     node_id = 0;
-%     for j = 1:N1; for i = 1:N1;
-%       node_id = node_id +1;
-%       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%     end;end
-%     xc = mean(Xe(:));
-%     yc = mean(Ye(:));
-%
-%     % add element number
-%     text(xc, yc, num2str(e), ...
-%          'HorizontalAlignment','center', ...
-%          'VerticalAlignment','middle', ...
-%          'FontWeight','bold', ...
-%          'Color','r');
-%
-% end
-% pause;
-% [X,Y]=morph_circ(X,Y);         % Morph mesh
+ figure; hold on; axis equal;
+ for e = 1:E
+     % Extract patch for element e
+     Xe = squeeze(X(:,e,:));
+     Ye = squeeze(Y(:,e,:));
+     % Plot grid lines
+     plot(Xe, Ye, 'k-');           % lines along R
+     plot(Xe', Ye', 'k-');         % lines along S
+
+     node_id = 0;
+     for j = 1:N1; for i = 1:N1;
+       node_id = node_id +1;
+       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+     end;end
+     xc = mean(Xe(:));
+     yc = mean(Ye(:));
+
+     % add element number
+     text(xc, yc, num2str(e), ...
+          'HorizontalAlignment','center', ...
+          'VerticalAlignment','middle', ...
+          'FontWeight','bold', ...
+          'Color','r');
+
+ end
+ pause;
+
+ % [X,Y]=morph_circ(X,Y);         % Morph mesh
 
 [Grr,Grs,Gss,Bl,Xr,Rx,Jac]=geom_elem(X,Y,Dh,w); % Terms for "A"
 vol = sum(sum(sum(Bl)))
@@ -100,17 +101,17 @@ BC_all = [ 'D' 'N' 'D' 'D' ;     %% U
            'N' 'D' 'N' 'N' ;     %% P
            'D' 'N' 'N' 'N' ];    %% T
 
-[Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num); 
-[Mv,Q,glo_num]=set_mask(BC_all(2,:),Nelx,Nely,Q,glo_num); 
+[Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
+[Mv,Q,glo_num]=set_mask(BC_all(2,:),Nelx,Nely,Q,glo_num);
 [Mp,Q,glo_num]=set_mask(BC_all(3,:),Nelx,Nely,Q,glo_num); ifnull=1;
-[Mt,Q,glo_num]=set_mask(BC_all(4,:),Nelx,Nely,Q,glo_num); 
+[Mt,Q,glo_num]=set_mask(BC_all(4,:),Nelx,Nely,Q,glo_num);
 
 [unxa_v,unya_v] = set_unxy(Mu,X,Y,Xr);
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 1 + 0*X;   %% Initial conditions
-V = 0 + 0*X; 
-T = 0 + 0*X; 
+U = 1 - Y.*Y;   %% Initial conditions
+V = 0 + 0*X;
+T = 0 + 0*X;
 end
 
