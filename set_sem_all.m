@@ -87,7 +87,7 @@ end; end;
           'Color','r');
 
  end
- pause;
+## pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
 

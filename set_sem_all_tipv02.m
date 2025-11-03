@@ -128,7 +128,7 @@ X(:,1,:)= X_K; Y(:,1,:) = Y_K;
           'Color','r');
 
  end
- pause;
+ %pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
 

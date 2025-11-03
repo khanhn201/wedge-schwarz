@@ -31,7 +31,7 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
 
 end; end;
 
- se_disp(glo_num,'glo_num')
+## se_disp(glo_num,'glo_num')
 
 Q=speye(nL);
 k=0;
