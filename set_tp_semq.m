@@ -31,7 +31,14 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
 
 end; end;
 
-## se_disp(glo_num,'glo_num')
+#se_disp(glo_num,'glo_num')
+##printf('glo_num at the top part \n')
+##for i = 1:Nelx
+##    for j = 1:size(glo_num,1)
+##        printf("glo_num = %f \n", glo_num(j,i,1));
+##    end
+##end
+##pause
 
 Q=speye(nL);
 k=0;

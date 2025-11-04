@@ -3,21 +3,9 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-##Nelx = 2;  Nely = 2; E = Nelx*Nely;
+Nelx = 2;  Nely = 2; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
-
-
-##%% Circular Geometry
-##x0 =  -1.5;  x1=-x0;  Lx=x1-x0;   % Domain coordinates and size
-##y0 =   1.0;  y1=1.5;  Ly=y1-y0;
-##
-##%% Base Geometry
-##x0 =   0.0;  x1=2.;  Lx=x1-x0;   % Domain coordinates and size
-##y0 =  -0.5;  y1=1.5;  Ly=y1-y0;
-##
-##zc = zwuni(Nelx); xc = x0 + Lx*(zc+1)/2;
-##zc = zwuni(Nely); yc = y0 + Ly*(zc+1)/2;
 
 %% Problem parameters, as function of N
 
@@ -81,7 +69,7 @@ X_K = 0.25*((1-R).*(1-S)*x1K + (1+R).*(1-S)*x2K + ...
             (1+R).*(1+S)*x3K + (1-R).*(1+S)*x4K);
 Y_K = 0.25*((1-R).*(1-S)*y1K + (1+R).*(1-S)*y2K + ...
             (1+R).*(1+S)*y3K + (1-R).*(1+S)*y4K);
-Y_K(:) = Y_K(:)*2+1;
+##Y_K(:) = Y_K(:)*2+1;
 % -------------------------------------------------------------------------
 % Plot everything
 % -------------------------------------------------------------------------
@@ -128,7 +116,7 @@ X(:,1,:)= X_K; Y(:,1,:) = Y_K;
           'Color','r');
 
  end
- %pause;
+ pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
 

@@ -38,7 +38,7 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
         else
             rb = [r, -1.0 + slope - slope*r];
         end
-        rb = [1.0*r, -1.0];
+##        rb = [1.0*r, -1.0];
     end
     function rb = top(r)
         rb = [2.0*r, 1.0];
@@ -113,5 +113,23 @@ dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 U = 1 - Y.*Y;   %% Initial conditions
 V = 0 + 0*X;
 T = 0 + 0*X;
+
+
+% Store overlapping interpolation points
+printf('**** Interpolation points at the top part *****\n')
+interpdata_top = [];
+n = 0;
+for i = 1:Nelx
+    for j = 1:size(X,1)
+        n = n+1;
+##        printf("Elem = %d, r = %f, s = %f, X = %f , Y = %f \n", i, j,1, X(j,i,1), Y(j,i,1));
+        interpdata_top = [interpdata_top ; i, j,1, X(j,i,1), Y(j,i,1)];
+    end
+end
+interpdata_top
+plot(X(:,1:Nelx,1), Y(:,1:Nelx,1), 'g')
+
+pause;
+
 end
 

@@ -1,35 +1,60 @@
 function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha)
 
+
+##[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
 k = istep;
-
-
-persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
-persistent V1 = 0*X; persistent V2 = 0*X; persistent V3 = 0*X;
-
-persistent F1 = 0*X; persistent F2 = 0*X; persistent F3 = 0*X;
-persistent f1 = 0*X; persistent f2 = 0*X; persistent f3 = 0*X;
-
-
-persistent G1 = 0*X; persistent G2 = 0*X; persistent G3 = 0*X;
-persistent g1 = 0*X; persistent g2 = 0*X; persistent g3 = 0*X;
-
-
-persistent T1 = 0*X; persistent T2 = 0*X; persistent T3 = 0*X;
-persistent H1 = 0*X; persistent H2 = 0*X; persistent H3 = 0*X;
-
-
-##F1=O;F2=O;F3=O; G1=O;G2=O;G3=O;
-##f1=O;f2=O;f3=O; g1=O;g2=O;g3=O;
-##T1=O;T2=O;T3=O; H1=O;H2=O;H3=O;
 %% System-solve parameters
-ifnull=0; tol=1.e-6; max_iter=140;
+tol=1.e-6; max_iter=140;
 
-%%   Set updated BDFk/EXTk coefficients
+
+##persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
+##persistent V1 = 0*X; persistent V2 = 0*X; persistent V3 = 0*X;
+##persistent F1 = 0*X; persistent F2 = 0*X; persistent F3 = 0*X;
+##persistent f1 = 0*X; persistent f2 = 0*X; persistent f3 = 0*X;
+##persistent G1 = 0*X; persistent G2 = 0*X; persistent G3 = 0*X;
+##persistent g1 = 0*X; persistent g2 = 0*X; persistent g3 = 0*X;
+##persistent T1 = 0*X; persistent T2 = 0*X; persistent T3 = 0*X;
+##persistent H1 = 0*X; persistent H2 = 0*X; persistent H3 = 0*X;
+%% --- Persistent history buffers (INIT SAFELY) ---
+persistent U1 U2 U3 V1 V2 V3 T1 T2 T3
+persistent F1 F2 F3 G1 G2 G3 H1 H2 H3
+persistent f1 f2 f3 g1 g2 g3           % (viscous/curlcurl parts)
+persistent last_sz                        % to detect grid changes
+
+% Bootstrap or re-bootstrap if:
+%  - first call (isempty)
+%  - istep == 1 (new time integration)
+%  - grid size changed
+need_init = isempty(U1) || k==1 || isempty(last_sz) || ~isequal(last_sz, size(U));
+
+if need_init
+    Z  = 0*U;     % zero of correct size
+    U1 = Z; U2 = Z; U3 = Z;
+    V1 = Z; V2 = Z; V3 = Z;
+    T1 = Z; T2 = Z; T3 = Z;
+
+    F1 = Z; F2 = Z; F3 = Z;    % conv/forcing history for U
+    G1 = Z; G2 = Z; G3 = Z;    % conv/forcing history for V
+    H1 = Z; H2 = Z; H3 = Z;    % conv/forcing history for T
+
+    f1 = Z; f2 = Z; f3 = Z;    % viscous (curlcurlX) history for U
+    g1 = Z; g2 = Z; g3 = Z;    % viscous (curlcurlY) history for V
+
+    last_sz = size(U);
+end
+
+
+  %%   Set updated BDFk/EXTk coefficients
      ndt = nu*dt; adt = alpha*dt;
      if k==1; a1=1; a2=0; a3=0; b0=1; b1=1; b2=0; b3=0; end;
      if k==2; a1=1.5; a2=-.5; a3=0; b0=1.5; b1=2; b2=-.5; b3=0; end;
      if k>=3; a1=3; a2=-3; a3=1; b0=11/6; b1=3; b2=-1.5; b3=2/6; end;
      d1=dt*a1; d2=dt*a2; d3=dt*a3;
+
+
+##     printf("-------- solve_2dnse ---------- \n");
+##     printf("k = %f \n",k);
+##     printf("a1= %f, a2 = %f, a3 = %f | b0 = %f, b1 = %f, b2 = %f, b3 = %f",a1, a2,a3,b0, b1,b2,b3);
 
 %%   Set dealiased advecting field
      [Cr,Cs]=set_advect_c(U,V,JM,BMh,Jac,Rx);
@@ -39,8 +64,11 @@ ifnull=0; tol=1.e-6; max_iter=140;
      if k>=1; FX =  0*Y; end;
      if k>=1; FY =  0*Y; end;
 
+
 %%   Evaluate curl-curl term (to be extrapolated)
-    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+%    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+     curlcurlX = 0*X;
+     curlcurlY = 0*Y;
 ##    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
 ##    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
 ##    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
@@ -48,7 +76,7 @@ ifnull=0; tol=1.e-6; max_iter=140;
 %
 %    Set Dirichlet conditions onto old fields
 %
-     [Ub,Vb,Tb]=set_dirichlet(U,V,T,Mu,Mv,Mt,X,Y);
+     [Ub,Vb,Tb]=set_dirichlet_tip(U,V,T,Mu,Mv,Mt,X,Y); %for tip part
 
 
 %%   Compute u-hat and u-tilde
@@ -89,7 +117,7 @@ ifnull=0; tol=1.e-6; max_iter=140;
 %    hold off; se_mesh  (X,Y,dP,s);  drawnow;
      Pfinal = P+dP;
 
-     [dPdx,dPdy]=grad(P,Rx,Dh);
+     [dPdx,dPdy]=grad(Pfinal,Rx,Dh);
      Uh = Uh - dt*Bl.*dPdx;
      Vh = Vh - dt*Bl.*dPdy;
 
@@ -109,5 +137,9 @@ ifnull=0; tol=1.e-6; max_iter=140;
      Vfinal=V+Vb;
      Tfinal=T+Tb;
 
+##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(U1))), max(max(max(U2))), max(max(max(U3))));
 
+##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(F1))), max(max(max(U2))), max(max(max(U3))));
 
+##     U3output = U3;
+##     V3output = V3;

@@ -1,4 +1,4 @@
-function [Ufinal,Vfinal,Pfinal,Tfinal,U3output,V3output]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha)
+function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha)
 
 
 ##[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
@@ -141,7 +141,7 @@ end
 
 ##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(F1))), max(max(max(U2))), max(max(max(U3))));
 
-     U3output = U3;
-     V3output = V3;
+##     U3output = U3;
+##     V3output = V3;
 
 
