@@ -1,4 +1,4 @@
-function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha,...
+function [U,V,P,T]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha,...
                                                     Uinterp_top,Vinterp_top,Tinterp_top,interpdata_top)
 
 
@@ -67,9 +67,9 @@ end
 
 
 %%   Evaluate curl-curl term (to be extrapolated)
-    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
-##     curlcurlX = 0*X;
-##     curlcurlY = 0*Y;
+    # [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+     curlcurlX = 0*X;
+     curlcurlY = 0*Y;
 ##    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
 ##    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
 ##    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
@@ -115,7 +115,7 @@ end
      divUt = weak_div(Ut,Vt,1.,Rx,Dh)/dt;
 %%   Add inhomogeneous Neumann data to divUT, if any. (Eq.(15) in split_slides.pdf)
      b0dt = b0/dt;
-     divUt = divUt - b0dt*( (1-Mu).*unxa_v.*Ub - (1-Mv).*unya_v.*Vb );
+     divUt = divUt - b0dt*( (1-Mu).*unxa_v.*Ub + (1-Mv).*unya_v.*Vb );
 
 %%   Pressure-Poisson solve
      h1=1; h0=0;
@@ -124,9 +124,9 @@ end
          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
      s=['Pressure. Step/Iter: = ' int2str([istep itp])];
 %    hold off; se_mesh  (X,Y,dP,s);  drawnow;
-     Pfinal = P+dP;
+     P = P+dP;
 
-     [dPdx,dPdy]=grad(Pfinal,Rx,Dh);
+     [dPdx,dPdy]=grad(P,Rx,Dh);
      Uh = Uh - dt*Bl.*dPdx;
      Vh = Vh - dt*Bl.*dPdy;
 
@@ -142,15 +142,6 @@ end
      [T,itt,res,lamda_h]=...
         pcg_lambda(Th,tol,max_iter,b0,adt,Mt,Q,Bl,Grr,Grs,Gss,Dh,dAT,ifnull);
 
-     Ufinal=U+Ub;  %% Add back any prescribed Dirichlet conditions
-     Vfinal=V+Vb;
-     Tfinal=T+Tb;
-
-##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(U1))), max(max(max(U2))), max(max(max(U3))));
-
-##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(F1))), max(max(max(U2))), max(max(max(U3))));
-
-##     U3output = U3;
-##     V3output = V3;
-
-
+     U=U+Ub;  %% Add back any prescribed Dirichlet conditions
+     V=V+Vb;
+     T=T+Tb;

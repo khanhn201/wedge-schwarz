@@ -67,9 +67,9 @@ end
 
 
 %%   Evaluate curl-curl term (to be extrapolated)
-    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
-##     curlcurlX = 0*X;
-##     curlcurlY = 0*Y;
+    # [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+     curlcurlX = 0*X;
+     curlcurlY = 0*Y;
 ##    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
 ##    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
 ##    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
@@ -114,7 +114,7 @@ end
      divUt = weak_div(Ut,Vt,1.,Rx,Dh)/dt;
 %%   Add inhomogeneous Neumann data to divUT, if any. (Eq.(15) in split_slides.pdf)
      b0dt = b0/dt;
-     divUt = divUt - b0dt*( (1-Mu).*unxa_v.*Ub - (1-Mv).*unya_v.*Vb );
+     divUt = divUt - b0dt*( (1-Mu).*unxa_v.*Ub + (1-Mv).*unya_v.*Vb );
 
 %%   Pressure-Poisson solve
      h1=1; h0=0;

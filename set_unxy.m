@@ -47,8 +47,8 @@ for e=1:E;
     tan_x=reshape(dxds(end,e,:),N1,1);
     tan_y=reshape(dyds(end,e,:),N1,1);
     area = sqrt(tan_x.^2+tan_y.^2);
-    unx  = -tan_y./area;
-    uny  =  tan_x./area;
+    unx  = tan_y./area;
+    uny  = -tan_x./area;
     unxa_v(end,e,:) = unx.*area.*w;
     unya_v(end,e,:) = uny.*area.*w;
   end;
@@ -59,8 +59,8 @@ for e=1:E;
     tan_x=reshape(dxdr(:,e,1),N1,1);
     tan_y=reshape(dydr(:,e,1),N1,1);
     area = sqrt(tan_x.^2+tan_y.^2);
-    unx  = -tan_y./area;
-    uny  =  tan_x./area;
+    unx  = tan_y./area;
+    uny  = -tan_x./area;
     unxa_v(:,e,1) = unx.*area.*w;
     unya_v(:,e,1) = uny.*area.*w;
   end;
@@ -83,6 +83,42 @@ for e=1:E;
 % str=['uny x area: ' int2str(e)];
 % se_mesh(X,Y,unya_v,str); pause(1); pause
 
+
+
 end;
+
+% figure; hold on; axis equal;
+% title('Mesh with boundary normals');
+% xlabel('X'); ylabel('Y');
+%
+% N1 = size(X,1);
+% E  = size(X,2);
+%
+% % Plot mesh lines (optional)
+% for e = 1:E
+%     % Plot element edges
+%     plot(squeeze(X(:,e,1)),   squeeze(Y(:,e,1)),   'k-'); % bottom
+%     plot(squeeze(X(:,e,end)), squeeze(Y(:,e,end)), 'k-'); % top
+%     plot(squeeze(X(1,e,:)),   squeeze(Y(1,e,:)),   'k-'); % left
+%     plot(squeeze(X(end,e,:)), squeeze(Y(end,e,:)), 'k-'); % right
+% end
+%
+% % === Plot normals ===
+% scale = 1;  % adjust for clarity
+% for e = 1:E
+%   for j = 1:N1
+%     for i = 1:N1
+%       % Plot only if normal is nonzero
+%       if abs(unxa_v(i,e,j)) + abs(unya_v(i,e,j)) > 0
+%         quiver(X(i,e,j), Y(i,e,j), ...
+%                unxa_v(i,e,j)*scale, unya_v(i,e,j)*scale, ...
+%                'r', 'LineWidth', 1.5);
+%       end
+%     end
+%   end
+% end
+%
+% legend('mesh','boundary normal (scaled)');
+% pause
 
 

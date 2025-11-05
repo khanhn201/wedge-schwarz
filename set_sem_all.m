@@ -34,17 +34,17 @@ alpha = (90-28.5/2) * pi/180;
 e=0;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        slope = 0.75;
+        slope = 0.65;
         if r <= 0.0
-            rb = [r*0.9, 0.9*tan(alpha) + slope*(r+1)];
+            rb = [r*0.5, 0.5*tan(alpha) + slope*(r+1)];
         else
-            rb = [r*0.9, 0.9*tan(alpha) + slope - slope*r];
+            rb = [r*0.5, 0.5*tan(alpha) + slope - slope*r];
         end
-##        rb = [1.0*r, -1.0];
+        % rb = [1.0*r, -1.0];
     end
     function rb = top(r)
         rb = [2.0*(r), 2*tan(alpha)];
-##        rb = [1.0*r, 1.0];
+        % rb = [1.0*r, 1.0];
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;

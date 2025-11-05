@@ -25,10 +25,10 @@ e=0;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
         slope = 0.5;
-        rb = [(r+1.0)/2.0, ((r+1)/2)*tan(alpha)];
+        rb = [(r+1.0)/2.0*0.7, ((r+1)/2)*0.7*tan(alpha)];
     end
     function rb = top(r)
-        rb = [ (r-1)/2, (0.2*(r+1)/2)*tan(alpha)+tan(alpha)];
+        rb = [ (r-1)/2*0.7, (0.2*(r+1)/2)*tan(alpha)+0.7*tan(alpha)];
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;
