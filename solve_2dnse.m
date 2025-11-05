@@ -1,4 +1,5 @@
-function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha)
+function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha,...
+                                                    Uinterp_top,Vinterp_top,Tinterp_top,interpdata_top)
 
 
 ##[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
@@ -66,9 +67,9 @@ end
 
 
 %%   Evaluate curl-curl term (to be extrapolated)
-%    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
-     curlcurlX = 0*X;
-     curlcurlY = 0*Y;
+    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+##     curlcurlX = 0*X;
+##     curlcurlY = 0*Y;
 ##    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
 ##    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
 ##    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
@@ -77,6 +78,14 @@ end
 %    Set Dirichlet conditions onto old fields
 %
      [Ub,Vb,Tb]=set_dirichlet(U,V,T,Mu,Mv,Mt,X,Y);
+
+     % interaction??
+     e = interpdata_top(:,1); r = interpdata_top(:,2); s = interpdata_top(:,3);
+     for i = 1:size(interpdata_top,1);
+       Ub(r(i),e(i),s(i)) = Uinterp_top(i);
+       Vb(r(i),e(i),s(i)) = Vinterp_top(i);
+       Tb(r(i),e(i),s(i)) = Tinterp_top(i);
+     endfor
 
 
 %%   Compute u-hat and u-tilde

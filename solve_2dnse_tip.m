@@ -1,4 +1,5 @@
-function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha)
+function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha, ...
+                                                        Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip)
 
 
 ##[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
@@ -66,9 +67,9 @@ end
 
 
 %%   Evaluate curl-curl term (to be extrapolated)
-%    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
-     curlcurlX = 0*X;
-     curlcurlY = 0*Y;
+    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+##     curlcurlX = 0*X;
+##     curlcurlY = 0*Y;
 ##    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
 ##    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
 ##    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
@@ -78,6 +79,13 @@ end
 %
      [Ub,Vb,Tb]=set_dirichlet_tip(U,V,T,Mu,Mv,Mt,X,Y); %for tip part
 
+     % interaction??
+     e = interpdata_tip(:,1); r = interpdata_tip(:,2); s = interpdata_tip(:,3);
+     for i = 1:size(interpdata_tip,1);
+       Ub(r(i),e(i),s(i)) = Uinterp_tip(i);
+       Vb(r(i),e(i),s(i)) = Vinterp_tip(i);
+       Tb(r(i),e(i),s(i)) = Tinterp_tip(i);
+     endfor
 
 %%   Compute u-hat and u-tilde
      U3=U2;U2=U1;U1=U;

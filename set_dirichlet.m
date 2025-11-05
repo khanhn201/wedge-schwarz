@@ -1,6 +1,11 @@
 function [U,V,T] = set_dirichlet(Uo,Vo,To,Mu,Mv,Mt,X,Y);
 
-U = 1 - Y.*Y;  %% Desired field at inflow
+N1 = size(X,1);
+E = size(X,2);
+Nelx = 2;
+
+U = 0 - 0*X;  %% Desired field at inflow
+U(:,E-Nelx+1, N1) =1;
 V = 0 + 0*X;  %% Desired field at inflow
 T = 1 + 0*X;  %% Desired field at inflow
 

@@ -1,4 +1,4 @@
-function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA]...
+function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA,interpdata_top]...
              = set_sem_all(N);
 
 hdr;    % 2-D SEM multi-element
@@ -29,19 +29,22 @@ Dh=deriv_mat(z);
 
 [R,S]=ndgrid(z,z);             % Build SEM mesh
 X=zeros(N1,E,N1); Y=X;
+alpha = (90-28.5/2) * pi/180;
+
 e=0;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        slope = 0.5;
+        slope = 0.75;
         if r <= 0.0
-            rb = [r, -1.0 + slope*(r+1)];
+            rb = [r*0.9, 0.9*tan(alpha) + slope*(r+1)];
         else
-            rb = [r, -1.0 + slope - slope*r];
+            rb = [r*0.9, 0.9*tan(alpha) + slope - slope*r];
         end
 ##        rb = [1.0*r, -1.0];
     end
     function rb = top(r)
-        rb = [2.0*r, 1.0];
+        rb = [2.0*(r), 2*tan(alpha)];
+##        rb = [1.0*r, 1.0];
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;
@@ -62,31 +65,31 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
     Y(:,e,:) = (ye00 + (ye10-ye00).*(R+1)/2) .* (-S+1)/2 ...
              + (ye01 + (ye11-ye01).*(R+1)/2) .* (1+S)/2;
 end; end;
- figure; hold on; axis equal;
- for e = 1:E
-     % Extract patch for element e
-     Xe = squeeze(X(:,e,:));
-     Ye = squeeze(Y(:,e,:));
-     % Plot grid lines
-     plot(Xe, Ye, 'k-');           % lines along R
-     plot(Xe', Ye', 'k-');         % lines along S
-
-     node_id = 0;
-     for j = 1:N1; for i = 1:N1;
-       node_id = node_id +1;
-       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-     end;end
-     xc = mean(Xe(:));
-     yc = mean(Ye(:));
-
-     % add element number
-     text(xc, yc, num2str(e), ...
-          'HorizontalAlignment','center', ...
-          'VerticalAlignment','middle', ...
-          'FontWeight','bold', ...
-          'Color','r');
-
- end
+## figure; hold on; axis equal;
+## for e = 1:E
+##     % Extract patch for element e
+##     Xe = squeeze(X(:,e,:));
+##     Ye = squeeze(Y(:,e,:));
+##     % Plot grid lines
+##     plot(Xe, Ye, 'k-');           % lines along R
+##     plot(Xe', Ye', 'k-');         % lines along S
+##
+##     node_id = 0;
+##     for j = 1:N1; for i = 1:N1;
+##       node_id = node_id +1;
+##       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+##     end;end
+##     xc = mean(Xe(:));
+##     yc = mean(Ye(:));
+##
+##     % add element number
+##     text(xc, yc, num2str(e), ...
+##          'HorizontalAlignment','center', ...
+##          'VerticalAlignment','middle', ...
+##          'FontWeight','bold', ...
+##          'Color','r');
+##
+## end
 ## pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
@@ -96,10 +99,10 @@ vol = sum(sum(sum(Bl)))
 [Q,glo_num]=set_tp_semq(Nelx,Nely,N);
 
 
-BC_all = [ 'D' 'N' 'D' 'D' ;     %% U
-           'D' 'N' 'D' 'D' ;     %% V
-           'N' 'D' 'N' 'N' ;     %% P
-           'D' 'N' 'N' 'N' ];    %% T
+BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
+           'D' 'D' 'D' 'D' ;     %% V
+           'N' 'N' 'N' 'N' ;     %% P
+           'N' 'N' 'D' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
 [Mv,Q,glo_num]=set_mask(BC_all(2,:),Nelx,Nely,Q,glo_num);
@@ -110,7 +113,7 @@ BC_all = [ 'D' 'N' 'D' 'D' ;     %% U
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 1 - Y.*Y;   %% Initial conditions
+U = 0 - 0*X;   %% Initial conditions
 V = 0 + 0*X;
 T = 0 + 0*X;
 
@@ -127,9 +130,9 @@ for i = 1:Nelx
     end
 end
 interpdata_top
-plot(X(:,1:Nelx,1), Y(:,1:Nelx,1), 'g')
+##plot(X(:,1:Nelx,1), Y(:,1:Nelx,1), 'g')
 
-pause;
+##pause;
 
 end
 

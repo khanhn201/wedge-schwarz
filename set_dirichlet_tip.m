@@ -4,9 +4,9 @@ function [U,V,T] = set_dirichlet_tip(Uo,Vo,To,Mu,Mv,Mt,X,Y);
 ##V = 0 + 0*X;  %% Desired field at inflow
 ##T = 1 + 0*X;  %% Desired field at inflow
 
-U = 1 + 0*X;  %% Desired field at inflow
-V = 1 + 0*X;  %% Desired field at inflow
-T = 1 + 0*X;  %% Desired field at inflow
+U = 0 + 0*X;  %% Desired field at inflow
+V = 0 + 0*X;  %% Desired field at inflow
+T = 0 + 0*X;  %% Desired field at inflow
 
 U = Mu.*Uo + (1-Mu).*U;   %% Old value in interior, new value on inflow
 V = Mv.*Vo + (1-Mv).*V;

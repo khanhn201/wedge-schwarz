@@ -4,27 +4,82 @@ close all;
 
 N=4;
 
-nu=1.e-1/4; alpha=1.e-4;
+nu=1.e2; alpha=1.e2;
 
 Re=1./nu;
 
 %% Set ICs, problem parameters as function of N
-##[U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA]=set_sem_all(N);
+[U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA,interpdata_top]=set_sem_all(N);
 
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
-unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip]=set_sem_all_tipv03(N);
+unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(N);
 
+
+% Plot mesh
+E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
+
+figure; hold on; axis equal;
+for e = 1:E1
+   %Extract patch for element e
+   Xe = squeeze(X(:,e,:));
+   Ye = squeeze(Y(:,e,:));
+   %Plot grid lines
+   plot(Xe, Ye, 'b-');           % lines along R
+   plot(Xe', Ye', 'b-');         % lines along S
+
+   node_id = 0;
+   for j = 1:N1; for i = 1:N1;
+     node_id = node_id +1;
+     text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+   end;end
+   xc = mean(Xe(:));
+   yc = mean(Ye(:));
+
+   % add element number
+   text(xc, yc, num2str(e), ...
+        'HorizontalAlignment','center', ...
+        'VerticalAlignment','middle', ...
+        'FontWeight','bold', ...
+        'Color','r');
+
+end
+
+for e = 1:E2
+   %Extract patch for element e
+   Xe = squeeze(X_tip(:,e,:));
+   Ye = squeeze(Y_tip(:,e,:));
+   %Plot grid lines
+   plot(Xe, Ye, 'r-');           % lines along R
+   plot(Xe', Ye', 'r-');         % lines along S
+
+   node_id = 0;
+   for j = 1:N1; for i = 1:N1;
+     node_id = node_id +1;
+     text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+   end;end
+   xc = mean(Xe(:));
+   yc = mean(Ye(:));
+
+   % add element number
+   text(xc, yc, num2str(e), ...
+        'HorizontalAlignment','center', ...
+        'VerticalAlignment','middle', ...
+        'FontWeight','bold', ...
+        'Color','r');
+
+end
+pause;
 %% Set dealiasing operators, JM,DM,BMh
 [JM,DM,BMh,Jf,dt] = set_dealiasing(N,z,Jac,U,V,Rx);
 [JM_tip,DM_tip,BMh_tip,Jf_tip,dt] = set_dealiasing(N,z_tip,Jac_tip,U_tip,V_tip,Rx_tip);
 
 
 
-dt=.1;
+
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=.01; nsteps=999;
+dt=1e-7; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -49,9 +104,20 @@ for iloop=1:1;
   for istep =1:nsteps; k=k+1;
 
         time = time + dt;
-##        %Solve 1 timestep for top
-##        [U,V,P,T] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
-##
+        %% Interpolation nodes
+
+        x_interp_top = interpdata_top(:,4);
+        y_interp_top = interpdata_top(:,5);
+        [Uinterp_top,Vinterp_top,Tinterp_top] = interpolate(x_interp_top,y_interp_top,X_tip,Y_tip,U_tip,V_tip,T_tip,z_tip);
+
+        %Solve 1 timestep for top
+        [U,V,P,T] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha, ...
+                               Uinterp_top,Vinterp_top,Tinterp_top,interpdata_top);
+
+        x_interp_tip = interpdata_tip(:,4);
+        y_interp_tip = interpdata_tip(:,5);
+        [Uinterp_tip,Vinterp_tip,Tinterp_tip] = interpolate(x_interp_tip,y_interp_tip,X,Y,U,V,T,z);
+
 ##        if mod(istep,5)==0 || istep==1;  kk=kk+1;
 ##
 ##    %      disp([itp itu itv itt])
@@ -88,32 +154,21 @@ for iloop=1:1;
 ##
 ##       end;
 
+
         %Solve for a tip
-        [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
-                                               istep, nu, alpha);
+##        [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
+##                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
+##                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip);
 
   %    Diagonostics
-        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
-        X = X_tip; Y = Y_tip; Jf = Jf_tip;
+##        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
+##        X = X_tip; Y = Y_tip; Jf = Jf_tip;
 
        if mod(istep,5)==0 || istep==1;  kk=kk+1;
 
   %      disp([itp itu itv itt])
 
          hold off;
-
-         umax = max(max(max(abs(U))));
-         vmax = max(max(max(abs(V))));
-         tmax = max(max(max(abs(T))));
-         um(kk) = umax; vm(kk) = vmax;
-         tm(kk) = tmax; ti(kk) = time;
-
-         Uf = tensor3(Jf,1,Jf,U);  Uf=U;
-         Vf = tensor3(Jf,1,Jf,V);  Vf=V;
-         Xf = tensor3(Jf,1,Jf,X);  Xf=X;
-         Yf = tensor3(Jf,1,Jf,Y);  Yf=Y;
-         Tf = tensor3(Jf,1,Jf,T);  Tf=P;
 
   %      if istep>2; Tf=Tf-Tfl; end;
   %      Tfl = tensor3(Jf,1,Jf,T);
@@ -122,20 +177,21 @@ for iloop=1:1;
          s=['Time,UVT_{max}: ' num2str(time) ',   ' num2str(tmax) ,...
             ', ' num2str(istep)'.'];
   ##        se_mesh  (Xf,Yf,Tf,s);  hold on;
-         hold off; se_quiver(Xf,Yf,Uf,Vf,s);  axis equal; hold on;
+         hold off; se_quiver(X,Y,U,V,s);  axis equal; hold on;
+         se_quiver(X_tip,Y_tip,U_tip,V_tip,s);  axis equal;
          % drawnow
          time
-         se_mesh(X,Y,T, s)
+
          drawnow; pause(0.1);
 
   ##       hold on; se_quiver(Xf,Yf,U3plt,V3plt,s); drawnow;pause(0.1);
   %      disp([umax vmax tmax])
 
        end;
-
-       if tmax > 10.9; break; end;
-       if umax > 10.9; break; end;
-       if vmax > 10.9; break; end;
+##
+##       if tmax > 10.9; break; end;
+##       if umax > 10.9; break; end;
+##       if vmax > 10.9; break; end;
 
    end;
 end;
