@@ -4,6 +4,7 @@ close all;
 
 N=30;
 
+
 nu=1; alpha=1.e-0;
 
 Re=1./nu;
@@ -14,7 +15,6 @@ Re=1./nu;
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
 unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(N);
-
 
 % Plot mesh
 E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
@@ -156,9 +156,9 @@ for iloop=1:1;
 
 
         %Solve for a tip
-        [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
-                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip);
+        % [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
+        %                                        Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
+        %                                        istep, nu, alpha,Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip);
   %    Diagonostics
 ##        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
 ##        X = X_tip; Y = Y_tip; Jf = Jf_tip;

@@ -2,20 +2,20 @@ function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs
                                                         Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip)
 
 
-##[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
+%%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
 k = istep;
 %% System-solve parameters
-tol=1.e-6; max_iter=140;
+tol=1.e-6; max_iter=10000;
 
 
-##persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
-##persistent V1 = 0*X; persistent V2 = 0*X; persistent V3 = 0*X;
-##persistent F1 = 0*X; persistent F2 = 0*X; persistent F3 = 0*X;
-##persistent f1 = 0*X; persistent f2 = 0*X; persistent f3 = 0*X;
-##persistent G1 = 0*X; persistent G2 = 0*X; persistent G3 = 0*X;
-##persistent g1 = 0*X; persistent g2 = 0*X; persistent g3 = 0*X;
-##persistent T1 = 0*X; persistent T2 = 0*X; persistent T3 = 0*X;
-##persistent H1 = 0*X; persistent H2 = 0*X; persistent H3 = 0*X;
+%%persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
+%%persistent V1 = 0*X; persistent V2 = 0*X; persistent V3 = 0*X;
+%%persistent F1 = 0*X; persistent F2 = 0*X; persistent F3 = 0*X;
+%%persistent f1 = 0*X; persistent f2 = 0*X; persistent f3 = 0*X;
+%%persistent G1 = 0*X; persistent G2 = 0*X; persistent G3 = 0*X;
+%%persistent g1 = 0*X; persistent g2 = 0*X; persistent g3 = 0*X;
+%%persistent T1 = 0*X; persistent T2 = 0*X; persistent T3 = 0*X;
+%%persistent H1 = 0*X; persistent H2 = 0*X; persistent H3 = 0*X;
 %% --- Persistent history buffers (INIT SAFELY) ---
 persistent U1 U2 U3 V1 V2 V3 T1 T2 T3
 persistent F1 F2 F3 G1 G2 G3 H1 H2 H3
@@ -53,9 +53,9 @@ end
      d1=dt*a1; d2=dt*a2; d3=dt*a3;
 
 
-##     printf("-------- solve_2dnse ---------- \n");
-##     printf("k = %f \n",k);
-##     printf("a1= %f, a2 = %f, a3 = %f | b0 = %f, b1 = %f, b2 = %f, b3 = %f",a1, a2,a3,b0, b1,b2,b3);
+%%     printf("-------- solve_2dnse ---------- \n");
+%%     printf("k = %f \n",k);
+%%     printf("a1= %f, a2 = %f, a3 = %f | b0 = %f, b1 = %f, b2 = %f, b3 = %f",a1, a2,a3,b0, b1,b2,b3);
 
 %%   Set dealiased advecting field
      [Cr,Cs]=set_advect_c(U,V,JM,BMh,Jac,Rx);
@@ -67,12 +67,12 @@ end
 
 
 %%   Evaluate curl-curl term (to be extrapolated)
-    # [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
-     curlcurlX = 0*X;
-     curlcurlY = 0*Y;
-##    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
-##    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
-##    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
+    [curlcurlX,curlcurlY,Omega]=curlcurl(U,V,Bl,Rx,Dh);
+     # curlcurlX = 0*X;
+     # curlcurlY = 0*Y;
+%%    Omega = Lxi*(Dhx*V) - Lyi*(U*Dhy');
+%%    curlcurlX =  Bl.*(Lyi*(Omega*Dhy'));
+%%    curlcurlY = -Bl.*(Lxi*(Dhx*Omega));
 
 %
 %    Set Dirichlet conditions onto old fields
@@ -92,7 +92,8 @@ end
         F3=F2;F2=F1;F1=-advectl(U,Cr,Cs,JM,DM)+Bl.*FX;
         f3=f2;f2=f1;f1=-nu*curlcurlX;
         Uh=Bl.*(b1*U1+b2*U2+b3*U3)+(d1*F1+d2*F2+d3*F3);
-        Ut=Uh+(d1*f1+d2*f2+d3*f3);
+        # Ut=Uh+(d1*f1+d2*f2+d3*f3);
+        Ut=Uh + f1;
         Uh=Uh-axl(Ub,b0,ndt,Bl,Grr,Grs,Gss,Dh);
 
 %%   Compute v-hat and v-tilde
@@ -100,7 +101,8 @@ end
         G3=G2;G2=G1;G1=-advectl(V,Cr,Cs,JM,DM)+Bl.*FY;
         g3=g2;g2=g1;g1=-nu*curlcurlY;
         Vh=Bl.*(b1*V1+b2*V2+b3*V3)+(d1*G1+d2*G2+d3*G3);
-        Vt=Vh+(d1*g1+d2*g2+d3*g3);
+        # Vt=Vh+(d1*g1+d2*g2+d3*g3);
+        Vt=Vh+g1;
         Vh=Vh-axl(Vb,b0,ndt,Bl,Grr,Grs,Gss,Dh);
 
 %%   Compute t-hat
@@ -121,6 +123,7 @@ end
      divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
      [dP,itp,res,lamda_h]=...
          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+     res
      s=['Pressure. Step/Iter: = ' int2str([istep itp])];
 %    hold off; se_mesh  (X,Y,dP,s);  drawnow;
      Pfinal = P+dP;
@@ -136,18 +139,13 @@ end
      dAU=1./dA; dAU=1./(b0*qqt(Q,Bl)+adt*dAU);
      [U,itu,res,lamda_h]=...
         pcg_lambda(Uh,tol,max_iter,b0,ndt,Mu,Q,Bl,Grr,Grs,Gss,Dh,dAU,ifnull);
+     res
      [V,itv,res,lamda_h]=...
         pcg_lambda(Vh,tol,max_iter,b0,ndt,Mv,Q,Bl,Grr,Grs,Gss,Dh,dAU,ifnull);
+     res
      [T,itt,res,lamda_h]=...
         pcg_lambda(Th,tol,max_iter,b0,adt,Mt,Q,Bl,Grr,Grs,Gss,Dh,dAT,ifnull);
 
      Ufinal=U+Ub;  %% Add back any prescribed Dirichlet conditions
      Vfinal=V+Vb;
      Tfinal=T+Tb;
-
-##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(U1))), max(max(max(U2))), max(max(max(U3))));
-
-##     printf("Ufinal = %f | U1= %f, U2 = %f, U3 = %f\n", max(max(max(Ufinal))), max(max(max(F1))), max(max(max(U2))), max(max(max(U3))));
-
-##     U3output = U3;
-##     V3output = V3;
