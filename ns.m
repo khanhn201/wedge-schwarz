@@ -1,8 +1,9 @@
+clear all
 
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=30;
+N=40;
 
 
 nu=1; alpha=1.e-0;
@@ -14,7 +15,7 @@ Re=1./nu;
 
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
-unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(N);
+unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(60);
 
 % Plot mesh
 E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
@@ -28,20 +29,20 @@ E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 %    plot(Xe, Ye, 'b-');           % lines along R
 %    plot(Xe', Ye', 'b-');         % lines along S
 %
-%    node_id = 0;
-%    for j = 1:N1; for i = 1:N1;
-%      node_id = node_id +1;
-%      text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%    end;end
-%    xc = mean(Xe(:));
-%    yc = mean(Ye(:));
+%    % node_id = 0;
+%    % for j = 1:N1; for i = 1:N1;
+%    %   node_id = node_id +1;
+%    %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%    % end;end
+%    % xc = mean(Xe(:));
+%    % yc = mean(Ye(:));
 %
 %    % add element number
-%    text(xc, yc, num2str(e), ...
-%         'HorizontalAlignment','center', ...
-%         'VerticalAlignment','middle', ...
-%         'FontWeight','bold', ...
-%         'Color','r');
+%    % text(xc, yc, num2str(e), ...
+%    %      'HorizontalAlignment','center', ...
+%    %      'VerticalAlignment','middle', ...
+%    %      'FontWeight','bold', ...
+%    %      'Color','r');
 %
 % end
 %
@@ -53,20 +54,20 @@ E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 %    plot(Xe, Ye, 'r-');           % lines along R
 %    plot(Xe', Ye', 'r-');         % lines along S
 %
-%    node_id = 0;
-%    for j = 1:N1; for i = 1:N1;
-%      node_id = node_id +1;
-%      text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%    end;end
-%    xc = mean(Xe(:));
-%    yc = mean(Ye(:));
-%
-%    % add element number
-%    text(xc, yc, num2str(e), ...
-%         'HorizontalAlignment','center', ...
-%         'VerticalAlignment','middle', ...
-%         'FontWeight','bold', ...
-%         'Color','r');
+%    % node_id = 0;
+%    % for j = 1:N1; for i = 1:N1;
+%    %   node_id = node_id +1;
+%    %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%    % end;end
+%    % xc = mean(Xe(:));
+%    % yc = mean(Ye(:));
+%    %
+%    % % add element number
+%    % text(xc, yc, num2str(e), ...
+%    %      'HorizontalAlignment','center', ...
+%    %      'VerticalAlignment','middle', ...
+%    %      'FontWeight','bold', ...
+%    %      'Color','r');
 %
 % end
 % pause;
@@ -79,7 +80,7 @@ E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-2; nsteps=999;
+dt=1e-6; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -156,9 +157,9 @@ for iloop=1:1;
 
 
         %Solve for a tip
-        % [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-        %                                        Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
-        %                                        istep, nu, alpha,Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip);
+        [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
+                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
+                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip);
   %    Diagonostics
 ##        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
 ##        X = X_tip; Y = Y_tip; Jf = Jf_tip;
@@ -176,7 +177,7 @@ for iloop=1:1;
          % s=['Time,UVT_{max}: ' num2str(time) ',   ' num2str(tmax) ,...
          %    ', ' num2str(istep)'.'];
          s='Time'
-         % se_mesh  (X,Y,U,s);hold on;
+         % se_mesh  (X,Y,P,s);hold on;
          % se_mesh  (X_tip,Y_tip,U_tip,s);
          % hold off; se_quiver(X,Y,U,V,s);  axis equal; hold on;
          % se_quiver(X_tip,Y_tip,U_tip,V_tip,s);  axis equal;
@@ -184,22 +185,23 @@ for iloop=1:1;
          y_all = [];
          u_all = [];
          v_all = [];
-
+         N_top = size(X,1);
          for e = 1:size(X,2)
-             x = reshape(X(:,e,:), N1, N1);
-             y = reshape(Y(:,e,:), N1, N1);
-             u = reshape(U(:,e,:), N1, N1);
-             v = reshape(V(:,e,:), N1, N1);
+             x = reshape(X(:,e,:), N_top, N_top);
+             y = reshape(Y(:,e,:), N_top, N_top);
+             u = reshape(U(:,e,:), N_top, N_top);
+             v = reshape(V(:,e,:), N_top, N_top);
              x_all = [x_all; x(:)];
              y_all = [y_all; y(:)];
              u_all = [u_all; u(:)];
              v_all = [v_all; v(:)];
          end
+         N_tip = size(X_tip,1);
          for e = 1:size(X_tip,2)
-             x = reshape(X_tip(:,e,:), N1, N1);
-             y = reshape(Y_tip(:,e,:), N1, N1);
-             u = reshape(U_tip(:,e,:), N1, N1);
-             v = reshape(V_tip(:,e,:), N1, N1);
+             x = reshape(X_tip(:,e,:), N_tip, N_tip);
+             y = reshape(Y_tip(:,e,:), N_tip, N_tip);
+             u = reshape(U_tip(:,e,:), N_tip, N_tip);
+             v = reshape(V_tip(:,e,:), N_tip, N_tip);
              x_all = [x_all; x(:)];
              y_all = [y_all; y(:)];
              u_all = [u_all; u(:)];
@@ -212,11 +214,11 @@ for iloop=1:1;
          % scatter(x_all, y_all, 10, mag, 'filled'); hold on;
          % colormap(jet);
          quiver(x_all, y_all, u_all, v_all, 'k');
-         xlim([-2.5,2.5]);
-         ylim([-0.5,8]);
+         xlim([-0.5,0.5]);
+         ylim([-0.1,1.2]);
 
 
-         % drawnow
+         drawnow
          time
 
 

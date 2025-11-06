@@ -2,7 +2,9 @@ function [Uinterp,Vinterp,Tinterp] = interpolate(x,y,X,Y,U,V,T,z)
 N1 = size(X,1);
 E = size(X,2);
 
-Uinterp = []; Vinterp = []; Tinterp = [];
+Uinterp = zeros(1, length(x));
+Vinterp = zeros(1, length(x));
+Tinterp = zeros(1, length(x));
 for k = 1:length(x)
 for e = 1:E
    % Corner coordinates of element e

@@ -4,6 +4,9 @@ function [U,V,P,T]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,M
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
 k = istep;
+k = 1;
+N1 = size(X,1);
+E = size(X,2);
 %% System-solve parameters
 tol=1.e-6; max_iter=1000;
 
@@ -13,6 +16,7 @@ persistent U1 U2 U3 V1 V2 V3 T1 T2 T3
 persistent F1 F2 F3 G1 G2 G3 H1 H2 H3
 persistent f1 f2 f3 g1 g2 g3           % (viscous/curlcurl parts)
 persistent last_sz                        % to detect grid changes
+persistent P_prev
 
 % Bootstrap or re-bootstrap if:
 %  - first call (isempty)
@@ -112,11 +116,26 @@ end
 %%   Pressure-Poisson solve
      h1=1; h0=0;
      divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
+     % size(divUt)
+     %
+     % P_bar = 0*P;
+     % for i=1:istep-1
+     %     size(P_prev)
+     %     Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+     %     alpha = sum(sum(sum(Pp.*divUt)));
+     %
+     %     P_bar = P_bar + alpha*Pp;
+     % end
+     % divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
+     % [dP,itp,res,lamda_h]=...
+     %     pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+     % s=['Pressure. Step/Iter: = ' int2str([istep itp])];
+     % res
+     % P = P+P_bar+dP;
+%    hold off; se_mesh  (X,Y,dP,s);  drawnow;
      [dP,itp,res,lamda_h]=...
          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
-     s=['Pressure. Step/Iter: = ' int2str([istep itp])];
      res
-%    hold off; se_mesh  (X,Y,dP,s);  drawnow;
      P = P+dP;
 
      [dPdx,dPdy]=grad(P,Rx,Dh);
@@ -140,3 +159,6 @@ end
      U=U+Ub;  %% Add back any prescribed Dirichlet conditions
      V=V+Vb;
      T=T+Tb;
+     size(P)
+
+     P_prev(istep, :, :, :) = P;

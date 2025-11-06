@@ -4,8 +4,9 @@ function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
 k = istep;
+k = 1;
 %% System-solve parameters
-tol=1.e-6; max_iter=10000;
+tol=1.e-6; max_iter=1000;
 
 
 %%persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
@@ -92,8 +93,8 @@ end
         F3=F2;F2=F1;F1=-advectl(U,Cr,Cs,JM,DM)+Bl.*FX;
         f3=f2;f2=f1;f1=-nu*curlcurlX;
         Uh=Bl.*(b1*U1+b2*U2+b3*U3)+(d1*F1+d2*F2+d3*F3);
-        # Ut=Uh+(d1*f1+d2*f2+d3*f3);
-        Ut=Uh + f1;
+        Ut=Uh+(d1*f1+d2*f2+d3*f3);
+        % Ut=Uh + f1;
         Uh=Uh-axl(Ub,b0,ndt,Bl,Grr,Grs,Gss,Dh);
 
 %%   Compute v-hat and v-tilde
@@ -101,8 +102,8 @@ end
         G3=G2;G2=G1;G1=-advectl(V,Cr,Cs,JM,DM)+Bl.*FY;
         g3=g2;g2=g1;g1=-nu*curlcurlY;
         Vh=Bl.*(b1*V1+b2*V2+b3*V3)+(d1*G1+d2*G2+d3*G3);
-        # Vt=Vh+(d1*g1+d2*g2+d3*g3);
-        Vt=Vh+g1;
+        Vt=Vh+(d1*g1+d2*g2+d3*g3);
+        % Vt=Vh+g1;
         Vh=Vh-axl(Vb,b0,ndt,Bl,Grr,Grs,Gss,Dh);
 
 %%   Compute t-hat
