@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 2;  Nely = 2; E = Nelx*Nely;
+Nelx = 5;  Nely = 5; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -107,21 +107,23 @@ T = 0 + 0*X;
 printf('**** Interpolation points at the tip part *****\n')
 interpdata_tip = [];
 n = 0;
-for k = 1:E
-   for j = 1:size(Y,1)
-    for i = 1:size(X,1)
-        n = n+1;
-        if k == 2 && i == N1
-##        printf("Elem = %d, r = %f, s = %f, X = %f , Y = %f \n", i, j,1, X(j,i,1), Y(j,i,1));
-          interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
-        elseif k == 3 && j == N1
-          interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
-        elseif (k == 4 && i == N1)  || (k == 4 &&j == N1)
-          interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
-        end
-     end
-    end
+for k = E-Nelx+1:E
+   j = N1
+   for i = 1:size(X,1)
+       n = n+1;
+       interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
+   end
 end
+for k = Nelx:Nelx:E
+   i = N1
+   for j = 1:size(Y,1)
+       n = n+1;
+       interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
+   end
+end
+
+
+
 interpdata_tip
 ##plot(X(N1,2,:), Y(N1,2,:), 'g')
 ##hold on;
