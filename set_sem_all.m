@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 2;  Nely = 2; E = Nelx*Nely;
+Nelx = 4;  Nely = 4; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -36,14 +36,14 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
         slope = 0.1;
         if r <= 0.0
-            rb = [r*0.5*0.25/2, 0.5*0.25*tan(alpha)/2 + slope*(r+1)];
+            rb = [sin(r*pi/2)*0.5*0.25/2, 0.5*0.25*tan(alpha)/2 + slope*(sin(r*pi/2)+1)];
         else
-            rb = [r*0.5*0.25/2, 0.5*0.25*tan(alpha)/2 + slope - slope*r];
+            rb = [sin(r*pi/2)*0.5*0.25/2, 0.5*0.25*tan(alpha)/2 + slope - slope*sin(r*pi/2)];
         end
         % rb = [r/2.0, 0.0];
     end
     function rb = top(r)
-        rb = [1.0*(r)*0.25, 0.25*tan(alpha)];
+        rb = [1.0*(sin(r*pi/2))*0.25, 0.25*tan(alpha)];
         % rb = [1.0*(r+1.0)/2.0, 1.0];
     end
     function rb = blend(r, s)
