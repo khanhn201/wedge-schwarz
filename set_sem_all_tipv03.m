@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 3;  Nely = 3; E = Nelx*Nely;
+Nelx = 2;  Nely = 2; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -24,16 +24,17 @@ alpha = (90-28.5/2) * pi/180;
 e=0;
 
 uf = @(x) -2*cos(pi/4*(x+1))+1;
-
+h = 0.45;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
         slope = 0.5;
         r = uf(r);
-        rb = [(r+1.0)/2.0*0.7*0.25/2, ((r+1)/2)*0.7*0.25*tan(alpha)/2];
+        rb = [(r+1.0)/2.0*h*0.25/2, ((r+1)/2)*h*0.25*tan(alpha)/2];
+
     end
     function rb = top(r)
         r = uf(r);
-        rb = [ (r-1)/2*0.7*0.25/2, (0.02*(r+1)/2)*tan(alpha) + 0.7*0.25*tan(alpha)/2];
+        rb = [ (r-1)/2*h*0.25/2, (0.02*(r+1)/2)*tan(alpha) + h*0.25*tan(alpha)/2];
     end
     function rb = blend(r, s)
         s = uf(s);
@@ -56,32 +57,32 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
              + (ye01 + (ye11-ye01).*(R+1)/2) .* (1+S)/2;
 end; end;
 
- figure; hold on; axis equal;
- for e = 1:E
-     % Extract patch for element e
-     Xe = squeeze(X(:,e,:));
-     Ye = squeeze(Y(:,e,:));
-     % Plot grid lines
-     plot(Xe, Ye, 'k-');           % lines along R
-     plot(Xe', Ye', 'k-');         % lines along S
+## figure; hold on; axis equal;
+## for e = 1:E
+##     % Extract patch for element e
+##     Xe = squeeze(X(:,e,:));
+##     Ye = squeeze(Y(:,e,:));
+##     % Plot grid lines
+##     plot(Xe, Ye, 'k-');           % lines along R
+##     plot(Xe', Ye', 'k-');         % lines along S
 
-     node_id = 0;
-     for j = 1:N1; for i = 1:N1;
-       node_id = node_id +1;
-       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-     end;end
-     xc = mean(Xe(:));
-     yc = mean(Ye(:));
+##     node_id = 0;
+##     for j = 1:N1; for i = 1:N1;
+##       node_id = node_id +1;
+##       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+##     end;end
+##     xc = mean(Xe(:));
+##     yc = mean(Ye(:));
 
-     % add element number
-     text(xc, yc, num2str(e), ...
-          'HorizontalAlignment','center', ...
-          'VerticalAlignment','middle', ...
-          'FontWeight','bold', ...
-          'Color','r');
+##     % add element number
+##     text(xc, yc, num2str(e), ...
+##          'HorizontalAlignment','center', ...
+##          'VerticalAlignment','middle', ...
+##          'FontWeight','bold', ...
+##          'Color','r');
 
- end
- pause;
+## end
+## pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
 
@@ -92,7 +93,7 @@ vol = sum(sum(sum(Bl)))
 
 BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
            'D' 'D' 'D' 'D' ;     %% V
-           'N' 'N' 'N' 'N' ;     %% P
+           'N' 'D' 'N' 'D' ;     %% P
            'N' 'D' 'N' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);

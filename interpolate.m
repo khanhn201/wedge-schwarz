@@ -1,10 +1,11 @@
-function [Uinterp,Vinterp,Tinterp] = interpolate(x,y,X,Y,U,V,T,z)
+function [Uinterp,Vinterp,Pinterp,Tinterp] = interpolate(x,y,X,Y,U,V,P,T,z)
 N1 = size(X,1);
 E = size(X,2);
 
 Uinterp = zeros(1, length(x));
 Vinterp = zeros(1, length(x));
 Tinterp = zeros(1, length(x));
+Pinterp = zeros(1, length(x));
 for k = 1:length(x)
 for e = 1:E
    % Corner coordinates of element e
@@ -30,6 +31,7 @@ for e = 1:E
 
       Uinterp(k) = tensor3(JS,1,JR,U(:,e,:));
       Vinterp(k) = tensor3(JS,1,JR,V(:,e,:));
+      Pinterp(k) = tensor3(JS,1,JR,P(:,e,:));
       Tinterp(k) = tensor3(JS,1,JR,T(:,e,:));
 
 ##       fprintf('Point (%.3f, %.3f) is inside element %d | Uintp = %f, Vintp = %f, Tinterp = %f.\n', x(k), y(k), e, Uinterp(k),Vinterp(k),Tinterp(k));

@@ -1,5 +1,5 @@
 function [U,V,P,T]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha,...
-                                                    Uinterp_top,Vinterp_top,Tinterp_top,interpdata_top)
+                                                    Uinterp_top,Vinterp_top,Pinterp_top,Tinterp_top,interpdata_top)
 
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
@@ -70,13 +70,14 @@ end
 %
 %    Set Dirichlet conditions onto old fields
 %
-     [Ub,Vb,Tb]=set_dirichlet(U,V,T,Mu,Mv,Mt,X,Y);
+     [Ub,Vb,Pb,Tb]=set_dirichlet(U,V,P,T,Mu,Mv,Mt,X,Y);
 
      % interaction??
      e = interpdata_top(:,1); r = interpdata_top(:,2); s = interpdata_top(:,3);
      for i = 1:size(interpdata_top,1);
        Ub(r(i),e(i),s(i)) = Uinterp_top(i);
        Vb(r(i),e(i),s(i)) = Vinterp_top(i);
+       Pb(r(i),e(i),s(i)) = Pinterp_top(i);
        Tb(r(i),e(i),s(i)) = Tinterp_top(i);
      endfor
 
@@ -120,8 +121,8 @@ end
      P_bar = 0*P;
      for i=1:istep-1
          Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-         alpha = sum(sum(sum(Pp.*divUt)));
-         P_bar = P_bar + alpha*Pp;
+         alphai = sum(sum(sum(Pp.*divUt)));
+         P_bar = P_bar + alphai*Pp;
      end
      divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
      [dP,itp,res,lamda_h]=...
@@ -162,9 +163,9 @@ end
      P_tilde = P;
      for i=1:istep-1
          Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-         alpha = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+         alphai = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
 
-         P_tilde = P_tilde - alpha*Pp;
+         P_tilde = P_tilde - alphai*Pp;
      end
      beta = sum(sum(sum(P_tilde.*axl(P_tilde,h0,h1,Bl,Grr,Grs,Gss,Dh))));
      if beta != 0

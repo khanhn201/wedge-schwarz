@@ -1,5 +1,5 @@
 function [U,V,P,T]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha, ...
-                                                        Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip)
+                                                        Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip)
 
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
@@ -50,6 +50,9 @@ end
 
 
   %%   Set updated BDFk/EXTk coefficients
+    nu
+    alpha
+    dt
      ndt = nu*dt; adt = alpha*dt;
      if k==1; a1=1; a2=0; a3=0; b0=1; b1=1; b2=0; b3=0; end;
      if k==2; a1=1.5; a2=-.5; a3=0; b0=1.5; b1=2; b2=-.5; b3=0; end;
@@ -81,13 +84,14 @@ end
 %
 %    Set Dirichlet conditions onto old fields
 %
-     [Ub,Vb,Tb]=set_dirichlet_tip(U,V,T,Mu,Mv,Mt,X,Y); %for tip part
+     [Ub,Vb,Pb,Tb]=set_dirichlet_tip(U,V,P,T,Mu,Mv,Mt,X,Y); %for tip part
 
      % interaction??
      e = interpdata_tip(:,1); r = interpdata_tip(:,2); s = interpdata_tip(:,3);
      for i = 1:size(interpdata_tip,1);
        Ub(r(i),e(i),s(i)) = Uinterp_tip(i);
        Vb(r(i),e(i),s(i)) = Vinterp_tip(i);
+       Pb(r(i),e(i),s(i)) = Pinterp_tip(i);
        Tb(r(i),e(i),s(i)) = Tinterp_tip(i);
      endfor
 
@@ -137,8 +141,8 @@ end
      P_bar = 0*P;
      for i=1:istep-1
          Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-         alpha = sum(sum(sum(Pp.*divUt)));
-         P_bar = P_bar + alpha*Pp;
+         alphai = sum(sum(sum(Pp.*divUt)));
+         P_bar = P_bar + alphai*Pp;
      end
      divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
      [dP,itp,res,lamda_h]=...
@@ -173,9 +177,9 @@ end
      P_tilde = P;
      for i=1:istep-1
          Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-         alpha = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+         alphai = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
 
-         P_tilde = P_tilde - alpha*Pp;
+         P_tilde = P_tilde - alphai*Pp;
      end
      beta = sum(sum(sum(P_tilde.*axl(P_tilde,h0,h1,Bl,Grr,Grs,Gss,Dh))));
      if beta != 0

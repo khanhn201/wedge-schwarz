@@ -32,13 +32,14 @@ X=zeros(N1,E,N1); Y=X;
 alpha = (90-28.5/2) * pi/180;
 
 e=0;
+h = 0.35;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        slope = 0.1;
+        slope = 0.075;
         if r <= 0.0
-            rb = [sin(r*pi/2)*0.5*0.25/2, 0.5*0.25*tan(alpha)/2 + slope*(sin(r*pi/2)+1)];
+            rb = [sin(r*pi/2)*h*0.25/2, h*0.25*tan(alpha)/2 + slope*(sin(r*pi/2)+1)];
         else
-            rb = [sin(r*pi/2)*0.5*0.25/2, 0.5*0.25*tan(alpha)/2 + slope - slope*sin(r*pi/2)];
+            rb = [sin(r*pi/2)*h*0.25/2, h*0.25*tan(alpha)/2 + slope - slope*sin(r*pi/2)];
         end
         % rb = [r/2.0, 0.0];
     end
@@ -101,7 +102,7 @@ vol = sum(sum(sum(Bl)))
 
 BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
            'D' 'D' 'D' 'D' ;     %% V
-           'N' 'N' 'N' 'N' ;     %% P
+           'N' 'N' 'D' 'D' ;     %% P
            'N' 'N' 'D' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
