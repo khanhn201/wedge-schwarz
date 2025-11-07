@@ -3,7 +3,7 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=10;
+N=20;
 
 
 nu=1; alpha=1.e-0;
@@ -15,7 +15,7 @@ Re=1./nu;
 
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
-unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(10);
+unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(20);
 
 ##% Plot mesh
 ##E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
@@ -45,7 +45,7 @@ unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(10);
 ##    %      'Color','r');
 ##
 ## end
-##
+
 ## for e = 1:E2
 ##    %Extract patch for element e
 ##    Xe = squeeze(X_tip(:,e,:));
@@ -179,8 +179,8 @@ for iloop=1:1;
          % s=['Time,UVT_{max}: ' num2str(time) ',   ' num2str(tmax) ,...
          %    ', ' num2str(istep)'.'];
          s='Time'
-         % se_mesh  (X,Y,P,s);hold on;
-         % se_mesh  (X_tip,Y_tip,U_tip,s);
+##          se_mesh  (X,Y,P,s);hold on;
+##          se_mesh  (X_tip,Y_tip,P_tip,s);zlim([-0.3,0.3])
          % hold off; se_quiver(X,Y,U,V,s);  axis equal; hold on;
          % se_quiver(X_tip,Y_tip,U_tip,V_tip,s);  axis equal;
          x_all = [];
@@ -213,15 +213,27 @@ for iloop=1:1;
          mag(mag == 0) = 1;  % avoid division by zero
          u_all = u_all ./ mag;
          v_all = v_all ./ mag;
-         % scatter(x_all, y_all, 10, mag, 'filled'); hold on;
-         % colormap(jet);
-         quiver(x_all, y_all, u_all, v_all, 'k');
+##         scatter(x_all, y_all, 10, mag, 'filled'); hold on;
+##         colormap(jet);
+##         quiver(x_all, y_all, u_all, v_all, 'k');
+
          xlim([-0.5,0.5]);
          ylim([-0.1,1.2]);
 
 
          drawnow
          time
+
+         % Choose initial seed point
+          x0 = 0.0;   % starting x
+          y0 = 0.8;   % starting y
+
+          % Integrate streamline using your function
+          [xs, ys] = integrate_streamline(x0, y0, 1, 10, X, Y, U, V, P, T, z);
+          % Plot the streamline on top
+          plot(xs, ys, 'k-', 'LineWidth', 1.5);
+
+
 
 
   ##       hold on; se_quiver(Xf,Yf,U3plt,V3plt,s); drawnow;pause(0.1);
@@ -373,5 +385,4 @@ end;
 %
 %    end;
 % end;
-%
-%
+

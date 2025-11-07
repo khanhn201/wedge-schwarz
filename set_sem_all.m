@@ -102,7 +102,7 @@ vol = sum(sum(sum(Bl)))
 
 BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
            'D' 'D' 'D' 'D' ;     %% V
-           'N' 'N' 'D' 'D' ;     %% P
+           'N' 'N' 'D' 'N' ;     %% P
            'N' 'N' 'D' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);

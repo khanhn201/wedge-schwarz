@@ -24,7 +24,7 @@ alpha = (90-28.5/2) * pi/180;
 e=0;
 
 uf = @(x) -2*cos(pi/4*(x+1))+1;
-h = 0.45;
+h = 0.5;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
         slope = 0.5;

@@ -7,6 +7,7 @@ Vinterp = zeros(1, length(x));
 Tinterp = zeros(1, length(x));
 Pinterp = zeros(1, length(x));
 for k = 1:length(x)
+  found = false;
 for e = 1:E
    % Corner coordinates of element e
    X11 = X(1,e,1);   Y11 = Y(1,e,1);
@@ -19,7 +20,14 @@ for e = 1:E
    y_elem = [Y11 Y21 Y22 Y12];
 
    % Check if (x, y) is inside this element
-   in = inpolygon(x(k), y(k), x_elem, y_elem);
+##   in = inpolygon(x(k), y(k), x_elem, y_elem);
+   eps  = 1e-3;
+   in = inpolygon(x(k), y(k), x_elem+eps, y_elem);
+   in = inpolygon(x(k), y(k), x_elem, y_elem+eps);
+
+   in = inpolygon(x(k), y(k), x_elem-eps, y_elem);
+   in = inpolygon(x(k), y(k), x_elem, y_elem-eps);
+
 
    if in
      x_elem = [X11 X21 X22 X12];
@@ -33,14 +41,24 @@ for e = 1:E
       Vinterp(k) = tensor3(JS,1,JR,V(:,e,:));
       Pinterp(k) = tensor3(JS,1,JR,P(:,e,:));
       Tinterp(k) = tensor3(JS,1,JR,T(:,e,:));
-
+      found = true;
 ##       fprintf('Point (%.3f, %.3f) is inside element %d | Uintp = %f, Vintp = %f, Tinterp = %f.\n', x(k), y(k), e, Uinterp(k),Vinterp(k),Tinterp(k));
        % You can now perform interpolation here...
-       break
    end
+
 end
+
+if found != true;
+printf("Cannot find interpation point!")
+fprintf('Point (%.3f, %.3f)\n', x(k), y(k));
 end
+
 end
+
+end
+
+
+
 
 function [r, s] = xy2rs(x, y, x_elem, y_elem)
 % x_elem, y_elem = [X11 X21 X22 X12]

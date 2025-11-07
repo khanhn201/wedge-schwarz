@@ -3,7 +3,7 @@ function [U,V,P,T]= solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,M
 
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
-k = istep;
+%k = istep;
 k = 1;
 N1 = size(X,1);
 E = size(X,2);
@@ -118,25 +118,25 @@ end
      h1=1; h0=0;
 
 
-     P_bar = 0*P;
-     for i=1:istep-1
-         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-         alphai = sum(sum(sum(Pp.*divUt)));
-         P_bar = P_bar + alphai*Pp;
-     end
-     divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
-     [dP,itp,res,lamda_h]=...
-         pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
-     % s=['Pressure. Step/Iter: = ' int2str([istep itp])];
-     res
-     P = P_bar+dP;
+##     P_bar = 0*P;
+##     for i=1:istep-1
+##         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+##         alphai = sum(sum(sum(Pp.*divUt)));
+##         P_bar = P_bar + alphai*Pp;
+##     end
+##     divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
+##     [dP,itp,res,lamda_h]=...
+##         pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+##     % s=['Pressure. Step/Iter: = ' int2str([istep itp])];
+##     res
+##     P = P_bar+dP;
 
-%    hold off; se_mesh  (X,Y,dP,s);  drawnow;
-     % divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
-     % [dP,itp,res,lamda_h]=...
-     %     pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
-     % res
-     % P = P+dP;
+##    hold off; se_mesh  (X,Y,dP,s);  drawnow;
+      divUt = divUt -axl(Pb,h0,h1,Bl,Grr,Grs,Gss,Dh);
+      [dP,itp,res,lamda_h]=...
+          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+      res
+      P = Pb+dP;
 
      [dPdx,dPdy]=grad(P,Rx,Dh);
      Uh = Uh - dt*Bl.*dPdx;
@@ -160,15 +160,15 @@ end
      V=V+Vb;
      T=T+Tb;
 
-     P_tilde = P;
-     for i=1:istep-1
-         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-         alphai = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
-
-         P_tilde = P_tilde - alphai*Pp;
-     end
-     beta = sum(sum(sum(P_tilde.*axl(P_tilde,h0,h1,Bl,Grr,Grs,Gss,Dh))));
-     if beta != 0
-         P_tilde =  P_tilde/beta;
-     end
-     P_prev(istep, :, :, :) = P_tilde;
+##     P_tilde = P;
+##     for i=1:istep-1
+##         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+##         alphai = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+##
+##         P_tilde = P_tilde - alphai*Pp;
+##     end
+##     beta = sum(sum(sum(P_tilde.*axl(P_tilde,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+##     if beta != 0
+##         P_tilde =  P_tilde/beta;
+##     end
+##     P_prev(istep, :, :, :) = P_tilde;
