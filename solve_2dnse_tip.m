@@ -1,12 +1,14 @@
-function [Ufinal,Vfinal,Pfinal,Tfinal]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha, ...
+function [U,V,P,T]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha, ...
                                                         Uinterp_tip,Vinterp_tip,Tinterp_tip,interpdata_tip)
 
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
 k = istep;
 k = 1;
+N1 = size(X,1);
+E = size(X,2);
 %% System-solve parameters
-tol=1.e-6; max_iter=1000;
+tol=1.e-6; max_iter=5000;
 
 
 %%persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
@@ -22,6 +24,7 @@ persistent U1 U2 U3 V1 V2 V3 T1 T2 T3
 persistent F1 F2 F3 G1 G2 G3 H1 H2 H3
 persistent f1 f2 f3 g1 g2 g3           % (viscous/curlcurl parts)
 persistent last_sz                        % to detect grid changes
+persistent P_prev
 
 % Bootstrap or re-bootstrap if:
 %  - first call (isempty)
@@ -121,15 +124,31 @@ end
 
 %%   Pressure-Poisson solve
      h1=1; h0=0;
-     divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
+%      divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
+%      [dP,itp,res,lamda_h]=...
+%          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+%      res
+%      s=['Pressure. Step/Iter: = ' int2str([istep itp])];
+% %    hold off; se_mesh  (X,Y,dP,s);  drawnow;
+%      Pfinal = P+dP;
+
+
+
+     P_bar = 0*P;
+     for i=1:istep-1
+         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+         alpha = sum(sum(sum(Pp.*divUt)));
+         P_bar = P_bar + alpha*Pp;
+     end
+     divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
      [dP,itp,res,lamda_h]=...
          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+     % s=['Pressure. Step/Iter: = ' int2str([istep itp])];
      res
-     s=['Pressure. Step/Iter: = ' int2str([istep itp])];
-%    hold off; se_mesh  (X,Y,dP,s);  drawnow;
-     Pfinal = P+dP;
+     P = P_bar+dP;
 
-     [dPdx,dPdy]=grad(Pfinal,Rx,Dh);
+
+     [dPdx,dPdy]=grad(P,Rx,Dh);
      Uh = Uh - dt*Bl.*dPdx;
      Vh = Vh - dt*Bl.*dPdy;
 
@@ -147,6 +166,19 @@ end
      [T,itt,res,lamda_h]=...
         pcg_lambda(Th,tol,max_iter,b0,adt,Mt,Q,Bl,Grr,Grs,Gss,Dh,dAT,ifnull);
 
-     Ufinal=U+Ub;  %% Add back any prescribed Dirichlet conditions
-     Vfinal=V+Vb;
-     Tfinal=T+Tb;
+     U=U+Ub;  %% Add back any prescribed Dirichlet conditions
+     V=V+Vb;
+     T=T+Tb;
+
+     P_tilde = P;
+     for i=1:istep-1
+         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+         alpha = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+
+         P_tilde = P_tilde - alpha*Pp;
+     end
+     beta = sum(sum(sum(P_tilde.*axl(P_tilde,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+     if beta != 0
+         P_tilde =  P_tilde/beta;
+     end
+     P_prev(istep, :, :, :) = P_tilde;

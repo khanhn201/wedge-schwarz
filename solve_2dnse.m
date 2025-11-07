@@ -8,7 +8,7 @@ k = 1;
 N1 = size(X,1);
 E = size(X,2);
 %% System-solve parameters
-tol=1.e-6; max_iter=1000;
+tol=1.e-6; max_iter=5000;
 
 
 %% --- Persistent history buffers (INIT SAFELY) ---
@@ -115,28 +115,27 @@ end
 
 %%   Pressure-Poisson solve
      h1=1; h0=0;
-     divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
-     % size(divUt)
-     %
-     % P_bar = 0*P;
-     % for i=1:istep-1
-     %     size(P_prev)
-     %     Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
-     %     alpha = sum(sum(sum(Pp.*divUt)));
-     %
-     %     P_bar = P_bar + alpha*Pp;
-     % end
-     % divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
-     % [dP,itp,res,lamda_h]=...
-     %     pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
-     % s=['Pressure. Step/Iter: = ' int2str([istep itp])];
-     % res
-     % P = P+P_bar+dP;
-%    hold off; se_mesh  (X,Y,dP,s);  drawnow;
+
+
+     P_bar = 0*P;
+     for i=1:istep-1
+         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+         alpha = sum(sum(sum(Pp.*divUt)));
+         P_bar = P_bar + alpha*Pp;
+     end
+     divUt = divUt - axl(P_bar,h0,h1,Bl,Grr,Grs,Gss,Dh);
      [dP,itp,res,lamda_h]=...
          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+     % s=['Pressure. Step/Iter: = ' int2str([istep itp])];
      res
-     P = P+dP;
+     P = P_bar+dP;
+
+%    hold off; se_mesh  (X,Y,dP,s);  drawnow;
+     % divUt = divUt -axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh);
+     % [dP,itp,res,lamda_h]=...
+     %     pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+     % res
+     % P = P+dP;
 
      [dPdx,dPdy]=grad(P,Rx,Dh);
      Uh = Uh - dt*Bl.*dPdx;
@@ -159,6 +158,16 @@ end
      U=U+Ub;  %% Add back any prescribed Dirichlet conditions
      V=V+Vb;
      T=T+Tb;
-     size(P)
 
-     P_prev(istep, :, :, :) = P;
+     P_tilde = P;
+     for i=1:istep-1
+         Pp = reshape(P_prev(i,:, : , :), [N1 E N1]);
+         alpha = sum(sum(sum(Pp.*axl(P,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+
+         P_tilde = P_tilde - alpha*Pp;
+     end
+     beta = sum(sum(sum(P_tilde.*axl(P_tilde,h0,h1,Bl,Grr,Grs,Gss,Dh))));
+     if beta != 0
+         P_tilde =  P_tilde/beta;
+     end
+     P_prev(istep, :, :, :) = P_tilde;
