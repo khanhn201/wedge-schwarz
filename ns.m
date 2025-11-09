@@ -3,7 +3,7 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=20;
+N=30;
 
 
 nu=1; alpha=1.e-0;
@@ -15,7 +15,7 @@ Re=1./nu;
 
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
-unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(20);
+unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(30);
 
 ##% Plot mesh
 ##E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
@@ -157,9 +157,11 @@ for iloop=1:1;
 
 
         %Solve for a tip
+        for k = 1:10
         [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt,JM_tip,DM_tip,BMh_tip, ...
+                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/10.,JM_tip,DM_tip,BMh_tip, ...
                                                istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip);
+        end
 
 
   %    Diagonostics
@@ -215,23 +217,24 @@ for iloop=1:1;
          v_all = v_all ./ mag;
 ##         scatter(x_all, y_all, 10, mag, 'filled'); hold on;
 ##         colormap(jet);
-##         quiver(x_all, y_all, u_all, v_all, 'k');
-
-         xlim([-0.5,0.5]);
-         ylim([-0.1,1.2]);
+         quiver(x_all, y_all, u_all, v_all, 'k');
 
 
-         drawnow
-         time
+
 
          % Choose initial seed point
-          x0 = 0.0;   % starting x
-          y0 = 0.8;   % starting y
-
-          % Integrate streamline using your function
-          [xs, ys] = integrate_streamline(x0, y0, 1, 10, X, Y, U, V, P, T, z);
-          % Plot the streamline on top
-          plot(xs, ys, 'k-', 'LineWidth', 1.5);
+         % for i=1:10
+         %  x0 = 0.0;   % starting x
+         %  y0 = 0.5+i/10*0.45;   % starting y
+         %
+         %  % Integrate streamline using your function
+         %  [xs, ys] = integrate_streamline(x0, y0, 0.1, 50, X, Y, U, V, P, T, z);
+         %  % Plot the streamline on top
+         %  plot(xs, ys, 'k-', 'LineWidth', 1.5); hold on;
+         % xlim([-0.5,0.5]);
+         % ylim([-0.1,1.2]);
+         % end
+         % drawnow
 
 
 
