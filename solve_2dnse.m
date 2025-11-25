@@ -8,7 +8,7 @@ k = 1;
 N1 = size(X,1);
 E = size(X,2);
 %% System-solve parameters
-tol=1.e-6; max_iter=5000;
+tol=1.e-16; max_iter=5000;
 
 
 %% --- Persistent history buffers (INIT SAFELY) ---

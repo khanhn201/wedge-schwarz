@@ -28,12 +28,5 @@ function [xs, ys] = integrate_streamline(x0, y0, dt, nsteps, X, Y, U, V, P, T, z
       % RK4 update
       xs(k) = x + dt/6 * (u1 + 2*u2 + 2*u3 + u4);
       ys(k) = y + dt/6 * (v1 + 2*v2 + 2*v3 + v4);
-
-      % Stop if outside domain or velocity is NaN
-      if isnan(xs(k)) || isnan(ys(k))
-          xs = xs(1:k-1);
-          ys = ys(1:k-1);
-          break;
-      end
   end
 

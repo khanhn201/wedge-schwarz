@@ -5,10 +5,11 @@ E = size(X,2);
 Nelx = 4;
 
 U = 0 - 0*X;  %% Desired field at inflow
-U(:,E-Nelx+1:E, N1) = 1;
+% U(:,E-Nelx+1:E, N1) = 1;
 V = 0 + 0*X;  %% Desired field at inflow
 P = 0 + 0*X;  %% Desired field at inflow
 T = 0 + 0*X;  %% Desired field at inflow
+T(:,E-Nelx+1:E, N1) = 1;
 
 U = Mu.*Uo + (1-Mu).*U;   %% Old value in interior, new value on inflow
 V = Mv.*Vo + (1-Mv).*V;

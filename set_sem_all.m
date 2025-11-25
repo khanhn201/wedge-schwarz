@@ -32,7 +32,7 @@ X=zeros(N1,E,N1); Y=X;
 alpha = (90-28.5/2) * pi/180;
 
 e=0;
-h = 0.35;
+h = 0.3;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
         slope = 0.075;

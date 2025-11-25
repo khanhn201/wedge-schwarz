@@ -3,10 +3,10 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=30;
+N=5;
 
 
-nu=1; alpha=1.e-0;
+nu=1; alpha=1.e-1;
 
 Re=1./nu;
 
@@ -15,61 +15,61 @@ Re=1./nu;
 
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
-unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(30);
+unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(5);
 
 ##% Plot mesh
-##E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
-##
-## figure; hold on; axis equal;
-## for e = 1:E1
-##    %Extract patch for element e
-##    Xe = squeeze(X(:,e,:));
-##    Ye = squeeze(Y(:,e,:));
-##    %Plot grid lines
-##    plot(Xe, Ye, 'b-');           % lines along R
-##    plot(Xe', Ye', 'b-');         % lines along S
-##
-##    % node_id = 0;
-##    % for j = 1:N1; for i = 1:N1;
-##    %   node_id = node_id +1;
-##    %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-##    % end;end
-##    % xc = mean(Xe(:));
-##    % yc = mean(Ye(:));
-##
-##    % add element number
-##    % text(xc, yc, num2str(e), ...
-##    %      'HorizontalAlignment','center', ...
-##    %      'VerticalAlignment','middle', ...
-##    %      'FontWeight','bold', ...
-##    %      'Color','r');
-##
-## end
+E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 
-## for e = 1:E2
-##    %Extract patch for element e
-##    Xe = squeeze(X_tip(:,e,:));
-##    Ye = squeeze(Y_tip(:,e,:));
-##    %Plot grid lines
-##    plot(Xe, Ye, 'r-');           % lines along R
-##    plot(Xe', Ye', 'r-');         % lines along S
-##
-##    % node_id = 0;
-##    % for j = 1:N1; for i = 1:N1;
-##    %   node_id = node_id +1;
-##    %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-##    % end;end
-##    % xc = mean(Xe(:));
-##    % yc = mean(Ye(:));
-##    %
-##    % % add element number
-##    % text(xc, yc, num2str(e), ...
-##    %      'HorizontalAlignment','center', ...
-##    %      'VerticalAlignment','middle', ...
-##    %      'FontWeight','bold', ...
-##    %      'Color','r');
-##
-## end
+ figure; hold on; axis equal;
+ for e = 1:E1
+    %Extract patch for element e
+    Xe = squeeze(X(:,e,:));
+    Ye = squeeze(Y(:,e,:));
+    %Plot grid lines
+    plot(Xe, Ye, 'b-');           % lines along R
+    plot(Xe', Ye', 'b-');         % lines along S
+
+    % node_id = 0;
+    % for j = 1:N1; for i = 1:N1;
+    %   node_id = node_id +1;
+    %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+    % end;end
+    % xc = mean(Xe(:));
+    % yc = mean(Ye(:));
+
+    % add element number
+    % text(xc, yc, num2str(e), ...
+    %      'HorizontalAlignment','center', ...
+    %      'VerticalAlignment','middle', ...
+    %      'FontWeight','bold', ...
+    %      'Color','r');
+
+ end
+
+ for e = 1:E2
+    %Extract patch for element e
+    Xe = squeeze(X_tip(:,e,:));
+    Ye = squeeze(Y_tip(:,e,:));
+    %Plot grid lines
+    plot(Xe, Ye, 'r-');           % lines along R
+    plot(Xe', Ye', 'r-');         % lines along S
+
+    % node_id = 0;
+    % for j = 1:N1; for i = 1:N1;
+    %   node_id = node_id +1;
+    %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+    % end;end
+    % xc = mean(Xe(:));
+    % yc = mean(Ye(:));
+    %
+    % % add element number
+    % text(xc, yc, num2str(e), ...
+    %      'HorizontalAlignment','center', ...
+    %      'VerticalAlignment','middle', ...
+    %      'FontWeight','bold', ...
+    %      'Color','r');
+
+ end
 ## pause;
 %% Set dealiasing operators, JM,DM,BMh
 [JM,DM,BMh,Jf,dt] = set_dealiasing(N,z,Jac,U,V,Rx);
@@ -80,7 +80,7 @@ unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tipv03(30);
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-3; nsteps=999;
+dt=1e-1; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -157,9 +157,9 @@ for iloop=1:1;
 
 
         %Solve for a tip
-        for k = 1:10
+        for kkkk=1:5
         [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/10.,JM_tip,DM_tip,BMh_tip, ...
+                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/5,JM_tip,DM_tip,BMh_tip, ...
                                                istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip);
         end
 
@@ -217,9 +217,14 @@ for iloop=1:1;
          v_all = v_all ./ mag;
 ##         scatter(x_all, y_all, 10, mag, 'filled'); hold on;
 ##         colormap(jet);
-         quiver(x_all, y_all, u_all, v_all, 'k');
+         % quiver(x_all, y_all, u_all, v_all, 'k');
+         % drawnow
 
 
+        s = 'time';
+        se_mesh  (X,Y,T,s);hold on;
+        se_mesh  (X_tip,Y_tip,T_tip,s);
+        drawnow;
 
 
          % Choose initial seed point

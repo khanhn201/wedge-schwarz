@@ -20,13 +20,13 @@ for e = 1:E
    y_elem = [Y11 Y21 Y22 Y12];
 
    % Check if (x, y) is inside this element
-##   in = inpolygon(x(k), y(k), x_elem, y_elem);
-   eps  = 1e-3;
-   in = inpolygon(x(k), y(k), x_elem+eps, y_elem);
-   in = inpolygon(x(k), y(k), x_elem, y_elem+eps);
-
-   in = inpolygon(x(k), y(k), x_elem-eps, y_elem);
-   in = inpolygon(x(k), y(k), x_elem, y_elem-eps);
+   eps  = 1e-4;
+   in = inpolygon(x(k), y(k), x_elem, y_elem);
+   % in = inpolygon(x(k), y(k), x_elem+eps, y_elem);
+   % in = inpolygon(x(k), y(k), x_elem, y_elem+eps);
+   %
+   % in = inpolygon(x(k), y(k), x_elem-eps, y_elem);
+   % in = inpolygon(x(k), y(k), x_elem, y_elem-eps);
 
 
    if in
