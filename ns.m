@@ -3,7 +3,7 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=30;
+N=10;
 
 
 nu=1; alpha=1.e-0;
@@ -157,9 +157,9 @@ for iloop=1:1;
 
 
         %Solve for a tip
-        for k = 1:10
+        for k = 1:1
         [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/10.,JM_tip,DM_tip,BMh_tip, ...
+                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/1.0,JM_tip,DM_tip,BMh_tip, ...
                                                istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip);
         end
 
@@ -168,7 +168,8 @@ for iloop=1:1;
 ##        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
 ##        X = X_tip; Y = Y_tip; Jf = Jf_tip;
 
-       if mod(istep,1)==0 || istep==1;  kk=kk+1;
+       #if mod(istep,1)==0 || istep==1;  kk=kk+1;
+        if (1 ==1);
 
   %      disp([itp itu itv itt])
 
@@ -217,24 +218,31 @@ for iloop=1:1;
          v_all = v_all ./ mag;
 ##         scatter(x_all, y_all, 10, mag, 'filled'); hold on;
 ##         colormap(jet);
-         quiver(x_all, y_all, u_all, v_all, 'k');
+        quiver(x_all, y_all, u_all, v_all, 'k');drawnow;
 
 
 
-
+         if istep >=30
          % Choose initial seed point
-         % for i=1:10
-         %  x0 = 0.0;   % starting x
-         %  y0 = 0.5+i/10*0.45;   % starting y
-         %
-         %  % Integrate streamline using your function
-         %  [xs, ys] = integrate_streamline(x0, y0, 0.1, 50, X, Y, U, V, P, T, z);
-         %  % Plot the streamline on top
-         %  plot(xs, ys, 'k-', 'LineWidth', 1.5); hold on;
-         % xlim([-0.5,0.5]);
-         % ylim([-0.1,1.2]);
-         % end
-         % drawnow
+          for i=1:10
+           x0 = 0.0;   % starting x
+           y0 = 0.5+i/10*0.45;   % starting y
+
+           x0_tip = 0.0;
+           y0_tip = 0.1 + i/10*0.8;
+
+           % Integrate streamline using your function
+           [xs, ys] = integrate_streamline(x0, y0, 0.1, 50, X, Y, U, V, P, T, z);
+
+           [xs_tip, ys_tip] = integrate_streamline_tip(x0_tip, y0_tip, 0.5, 50, X_tip, Y_tip, U_tip, V_tip, P_tip, T_tip, z_tip);
+           % Plot the streamline on top
+           plot(xs, ys, 'b-', 'LineWidth', 1.5); hold on;
+           plot(xs_tip, ys_tip, 'r-', 'LineWidth', 1.5); hold on;
+           xlim([-0.5,0.5]);
+           ylim([-0.1,1.2]);
+          end
+          end
+          drawnow
 
 
 
