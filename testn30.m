@@ -16,7 +16,7 @@ clear; close all; clc;
 ## [xs, ys] = integrate_streamline(x0, y0,dtstream, 200, X, Y, X_tip, Y_tip, U,U_tip, V,V_tip,z, z_tip,C);
 ##
 ## % Plot the streamline on top
-## plot(xs, ys, 'b-', 'LineWidth', 1.5); hold on;drawnow;
+## plxs 'b-', 'LineWidth', 1.5); hold on;drawnow;
 ##
 ## xplt{i} = xs;
 ## yplt{i} = ys;

@@ -1,0 +1,65 @@
+function [xs, ys] = integrate_streamline_tip(x0, y0, dt, nsteps, X, Y, U, V, P, T, z)
+  xs = zeros(1, nsteps);
+  ys = zeros(1, nsteps);
+  xs(1) = x0;
+  ys(1) = y0;
+
+  for k = 2:nsteps
+      x = xs(k-1);
+      y = ys(k-1);
+
+
+      % Corner coordinates of element e
+      X11 = X(1,1,1);   Y11 = Y(1,1,1);
+      X21 = X(N1,2,1);  Y21 = Y(N1,2,1);
+      X12 = X(1,3,N1);  Y12 = Y(1,3,N1);
+      X22 = X(N1,4,N1); Y22 = Y(N1,4,N1);
+
+      % Coordinates of the element’s corners
+      x_elem = [X11 X21 X22 X12];
+      y_elem = [Y11 Y21 Y22 Y12];
+      intip1 = inpolygon(x, y, x_elem, y_elem);
+
+
+      if intip1
+        % Get local velocity from your interpolate function
+        [u1, v1, ~, ~] = interpolate([x], [y], X_tip, Y_tip, U, V, P, T, z);
+      else
+        [u1,v1,~,~] = interpolate([x], [y], X, Y, U, V, P, T, z);
+      end
+
+      intip2 = inpolygon(x + 0.5*dt*u1, y + 0.5*dt*v1, x_elem,y_elem);
+
+      if intip1
+        % Get local velocity from your interpolate function
+        [u1, v1, ~, ~] = interpolate([x], [y], X_tip, Y_tip, U, V, P, T, z);
+      else
+        [u1,v1,~,~] = interpolate([x], [y], X, Y, U, V, P, T, z);
+      end
+        if intip_1
+        [Uinterp, Vinterp, ~, ~] = interpolate([x + 0.5*dt*u1], [y + 0.5*dt*v1], X, Y, U, V, P, T, z);
+        u2 = Uinterp;
+        v2 = Vinterp;
+
+        [Uinterp, Vinterp, ~, ~] = interpolate([x + 0.5*dt*u2], [y + 0.5*dt*v2], X, Y, U, V, P, T, z);
+        u3 = Uinterp;
+        v3 = Vinterp;
+
+        [Uinterp, Vinterp, ~, ~] = interpolate([x + dt*u3], [y + dt*v3], X, Y, U, V, P, T, z);
+        u4 = Uinterp;
+        v4 = Vinterp;
+
+        % RK4 update
+        xs(k) = x + dt/6 * (u1 + 2*u2 + 2*u3 + u4);
+        ys(k) = y + dt/6 * (v1 + 2*v2 + 2*v3 + v4);
+
+        % Stop if outside domain or velocity is NaN
+        if isnan(xs(k)) || isnan(ys(k))
+            xs = xs(1:k-1);
+            ys = ys(1:k-1);
+            break;
+        end
+      endif
+
+  end
+
