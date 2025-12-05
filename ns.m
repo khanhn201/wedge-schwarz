@@ -6,7 +6,7 @@ close all;
 N=8;
 
 
-nu=1; alpha=1.e-0;
+nu=5e-3; alpha=1.e-0;
 
 Re=1./nu;
 
@@ -18,8 +18,8 @@ Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
 unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tip(5);
 
 omegx = -Y_tip; omegy = X_tip;
-% Plot mesh
-E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
+###Plot mesh
+##E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 ##
 ##figure; hold on; axis equal;
 ##for e = 1:E1
@@ -81,7 +81,7 @@ E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-1; nsteps=999;
+dt=1e-2; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 

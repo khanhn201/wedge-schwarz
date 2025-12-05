@@ -74,7 +74,7 @@ end
 %
 %    Set Dirichlet conditions onto old fields
 %
-     [Ub,Vb,Pb,Tb]=set_dirichlet_tip(U,V,P,T,Mu,Mv,Mt,X,Y); %for tip part
+     [Ub,Vb,Pb,Tb]=set_dirichlet_tip(U,V,P,T,Mu,Mv,Mt,X,Y,omegx,omegy); %for tip part
 
      % interaction??
      e = interpdata_tip(:,1); r = interpdata_tip(:,2); s = interpdata_tip(:,3);

@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 8;  Nely = 2; E = Nelx*Nely;
+Nelx = 8;  Nely = 4; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -35,17 +35,7 @@ e=0;
 h = 0.35;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        if r <= -0.5
-            rb = [r*2+1.5, 0.5];
-        elseif r <= 0
-            rb = [0.5, r*-2-0.5];
-        elseif r <=0.5
-            rb = [r*-2+0.5, -0.5];
-        else
-            rb = [-0.5, r*2-1.5];
-
-        end
-        % rb = [r/2.0, 0.0];
+        rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)];
     end
     function rb = top(r)
         if r <= -0.5
@@ -82,10 +72,10 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
 end; end;
 ## figure; hold on; axis equal;
 ## for e = 1:E
-##     % Extract patch for element e
+##      Extract patch for element e
 ##     Xe = squeeze(X(:,e,:));
 ##     Ye = squeeze(Y(:,e,:));
-##     % Plot grid lines
+##      Plot grid lines
 ##     plot(Xe, Ye, 'k-');           % lines along R
 ##     plot(Xe', Ye', 'k-');         % lines along S
 ##
@@ -97,7 +87,7 @@ end; end;
 ##     xc = mean(Xe(:));
 ##     yc = mean(Ye(:));
 ##
-##     % add element number
+##      add element number
 ##     text(xc, yc, num2str(e), ...
 ##          'HorizontalAlignment','center', ...
 ##          'VerticalAlignment','middle', ...
@@ -105,7 +95,6 @@ end; end;
 ##          'Color','r');
 ##
 ## end
-## pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
 
@@ -115,7 +104,7 @@ vol = sum(sum(sum(Bl)))
 
 BC_all = [ 'P' 'P' 'D' 'D' ;     %% U
            'P' 'P' 'D' 'D' ;     %% V
-           'N' 'N' 'D' 'N' ;     %% P
+           'P' 'P' 'D' 'N' ;     %% P
            'P' 'P' 'D' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
@@ -127,7 +116,7 @@ BC_all = [ 'P' 'P' 'D' 'D' ;     %% U
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 1 - 0*X;   %% Initial conditions
+U = 0 - 0*X;   %% Initial conditions
 V = 0 + 0*X;
 T = 0 + 0*X;
 

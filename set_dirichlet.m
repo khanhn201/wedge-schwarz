@@ -4,7 +4,7 @@ N1 = size(X,1);
 E = size(X,2);
 
 
-U = 1 - (Y/5).^2;  %% Desired field at inflow
+U = 1 + 0*X;%1 - (Y/5).^2;  %% Desired field at inflow
 
 V = 0 + 0*X;  %% Desired field at inflow
 P = 0 + 0*X;  %% Desired field at inflow
