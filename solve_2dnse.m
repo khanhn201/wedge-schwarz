@@ -8,7 +8,7 @@ k = 1;
 N1 = size(X,1);
 E = size(X,2);
 %% System-solve parameters
-tol=1.e-6; max_iter=5000;
+tol=1.e-6; max_iter=100;
 
 
 %% --- Persistent history buffers (INIT SAFELY) ---
@@ -134,7 +134,7 @@ end
 ##    hold off; se_mesh  (X,Y,dP,s);  drawnow;
       divUt = divUt -axl(Pb,h0,h1,Bl,Grr,Grs,Gss,Dh);
       [dP,itp,res,lamda_h]=...
-          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+          pcg_lambda_pressure(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
       res
       P = Pb+dP;
 
