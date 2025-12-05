@@ -1,5 +1,5 @@
 function [U,V,P,T]= solve_2dnse_tip(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep, nu, alpha, ...
-                                                        Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip)
+                                                        Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip, omegx, omegy)
 
 
 %%[U,V,P,T,U3plt,V3plt] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha);
@@ -10,16 +10,6 @@ E = size(X,2);
 %% System-solve parameters
 tol=1.e-12; max_iter=5000;
 
-
-%%persistent U1 = 0*X; persistent U2 = 0*X; persistent U3 = 0*X;
-%%persistent V1 = 0*X; persistent V2 = 0*X; persistent V3 = 0*X;
-%%persistent F1 = 0*X; persistent F2 = 0*X; persistent F3 = 0*X;
-%%persistent f1 = 0*X; persistent f2 = 0*X; persistent f3 = 0*X;
-%%persistent G1 = 0*X; persistent G2 = 0*X; persistent G3 = 0*X;
-%%persistent g1 = 0*X; persistent g2 = 0*X; persistent g3 = 0*X;
-%%persistent T1 = 0*X; persistent T2 = 0*X; persistent T3 = 0*X;
-%%persistent H1 = 0*X; persistent H2 = 0*X; persistent H3 = 0*X;
-%% --- Persistent history buffers (INIT SAFELY) ---
 persistent U1 U2 U3 V1 V2 V3 T1 T2 T3
 persistent F1 F2 F3 G1 G2 G3 H1 H2 H3
 persistent f1 f2 f3 g1 g2 g3           % (viscous/curlcurl parts)
@@ -65,7 +55,7 @@ end
 %%     printf("a1= %f, a2 = %f, a3 = %f | b0 = %f, b1 = %f, b2 = %f, b3 = %f",a1, a2,a3,b0, b1,b2,b3);
 
 %%   Set dealiased advecting field
-     [Cr,Cs]=set_advect_c(U,V,JM,BMh,Jac,Rx);
+     [Cr,Cs]=set_advect_c(U-omegx,V-omegy,JM,BMh,Jac,Rx);
 
 %%   Set body force, volumetric heating
      if k>=1; QT =  0*Y; end;  %% No forcing, no heating
@@ -130,7 +120,7 @@ end
      h1=1; h0=0;
       divUt = divUt -axl(Pb,h0,h1,Bl,Grr,Grs,Gss,Dh);
       [dP,itp,res,lamda_h]=...
-          pcg_lambda_pressure(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
+          pcg_lambda(divUt,tol,max_iter,h0,h1,Mp,Q,Bl,Grr,Grs,Gss,Dh,dA,ifnull);
       res
       s=['Pressure. Step/Iter: = ' int2str([istep itp])];
  %    hold off; se_mesh  (X,Y,dP,s);  drawnow;

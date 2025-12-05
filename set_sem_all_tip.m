@@ -86,7 +86,7 @@ vol = sum(sum(sum(Bl)))
 
 BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
            'D' 'D' 'D' 'D' ;     %% V
-           'N' 'N' 'N' 'N' ;     %% P
+           'D' 'D' 'D' 'D' ;     %% P
            'N' 'D' 'N' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
@@ -140,17 +140,6 @@ end
 
 
 interpdata_tip
-##plot(X(N1,2,:), Y(N1,2,:), 'g')
-##hold on;
-##plot(X(:,3,N1), Y(:,3,N1), 'g')
-##plot(X(N1,4,:), Y(N1,4,:), 'g')
-##plot(X(:,4,N1), Y(:,4,N1), 'g')
-##hold off;
-##size(interpdata_tip)
-##pause
-##hold on;
-##plot(interpdata_tip(:,4), interpdata_tip(:,5), '*');
-##
-##pause;
+
 end
 

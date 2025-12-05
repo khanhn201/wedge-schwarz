@@ -17,6 +17,7 @@ Re=1./nu;
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
 unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tip(5);
 
+omegx = -Y_tip; omegy = X_tip;
 % Plot mesh
 E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 ##
@@ -80,7 +81,7 @@ E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-3; nsteps=999;
+dt=1e-1; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -119,51 +120,19 @@ for iloop=1:1;
         y_interp_tip = interpdata_tip(:,5);
         [Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip] = interpolate(x_interp_tip,y_interp_tip,X,Y,U,V,P,T,z);
 
-##        if mod(istep,1)==0 || istep==1;  kk=kk+1;
-##
-##    %      disp([itp itu itv itt])
-##
-##           hold off;
-##
-##           umax = max(max(max(abs(U))));
-##           vmax = max(max(max(abs(V))));
-##           tmax = max(max(max(abs(T))));
-##           um(kk) = umax; vm(kk) = vmax;
-##           tm(kk) = tmax; ti(kk) = time;
-##
-##           Uf = tensor3(Jf,1,Jf,U);  Uf=U;
-##           Vf = tensor3(Jf,1,Jf,V);  Vf=V;
-##           Xf = tensor3(Jf,1,Jf,X);  Xf=X;
-##           Yf = tensor3(Jf,1,Jf,Y);  Yf=Y;
-##           Tf = tensor3(Jf,1,Jf,T);  Tf=P;
-##
-##    %      if istep>2; Tf=Tf-Tfl; end;
-##    %      Tfl = tensor3(Jf,1,Jf,T);
-##    %      tmax = max(max(max(abs(Tf))));
-##
-##           s=['Time,UVT_{max}: ' num2str(time) ',   ' num2str(tmax) ,...
-##              ', ' num2str(istep)'.'];
-##    ##        se_mesh  (Xf,Yf,Tf,s);  hold on;
-##           hold off; se_quiver(Xf,Yf,Uf,Vf,s);  axis equal; hold on;
-##           % drawnow
-##           time
-##           se_mesh(X,Y,T, s)
-##           drawnow; pause(0.1);
-##
-##    ##       hold on; se_quiver(Xf,Yf,U3plt,V3plt,s); drawnow;pause(0.1);
-##    %      disp([umax vmax tmax])
-##
-##       end;
-
 
         %Solve for a tip
         for k = 1:1
         [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
                                                Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/1.0,JM_tip,DM_tip,BMh_tip, ...
-                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip);
+                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip, omegx, omegy);
         end
 
+        X_tip = X_tip+omegx*dt;
+        Y_tip = Y_tip+omegy*dt;
 
+        omegx = -Y_tip;
+        omegy = X_tip;
   %    Diagonostics
 ##        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
 ##        X = X_tip; Y = Y_tip; Jf = Jf_tip;
@@ -216,8 +185,8 @@ for iloop=1:1;
          mag(mag == 0) = 1;  % avoid division by zero
 ##         u_all = u_all ./ mag;
 ##         v_all = v_all ./ mag;
-##         scatter(x_all, y_all, 10, mag, 'filled'); hold on;
-##         colormap(jet);
+         scatter(x_all, y_all, 10, mag, 'filled'); hold on;
+         colormap(jet);
         quiver(x_all, y_all, u_all, v_all, 'k');drawnow;
 
 
