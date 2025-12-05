@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 4;  Nely = 4; E = Nelx*Nely;
+Nelx = 8;  Nely = 2; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -35,17 +35,31 @@ e=0;
 h = 0.35;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        slope = 0.075;
-        if r <= 0.0
-            rb = [sin(r*pi/2)*h*0.25/2, h*0.25*tan(alpha)/2 + slope*(sin(r*pi/2)+1)];
+        if r <= -0.5
+            rb = [r*2+1.5, 0.5];
+        elseif r <= 0
+            rb = [0.5, r*-2-0.5];
+        elseif r <=0.5
+            rb = [r*-2+0.5, -0.5];
         else
-            rb = [sin(r*pi/2)*h*0.25/2, h*0.25*tan(alpha)/2 + slope - slope*sin(r*pi/2)];
+            rb = [-0.5, r*2-1.5];
+
         end
         % rb = [r/2.0, 0.0];
     end
     function rb = top(r)
-        rb = [1.0*(sin(r*pi/2))*0.25, 0.25*tan(alpha)];
-        % rb = [1.0*(r+1.0)/2.0, 1.0];
+        if r <= -0.5
+            rb = [r*2+1.5, 0.5];
+        elseif r <= 0
+            rb = [0.5, r*-2-0.5];
+        elseif r <=0.5
+            rb = [r*-2+0.5, -0.5];
+        else
+            rb = [-0.5, r*2-1.5];
+        end
+        rb(:) = rb(:)*10;
+
+       rb(1)= rb(1)*2;
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;
@@ -99,11 +113,10 @@ end; end;
 vol = sum(sum(sum(Bl)))
 [Q,glo_num]=set_tp_semq(Nelx,Nely,N);
 
-
-BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
-           'D' 'D' 'D' 'D' ;     %% V
-           'N' 'N' 'D' 'N' ;     %% P
-           'N' 'N' 'D' 'D' ];    %% T
+BC_all = [ 'P' 'P' 'D' 'D' ;     %% U
+           'P' 'P' 'D' 'D' ;     %% V
+           'N' 'N' 'N' 'N' ;     %% P
+           'P' 'P' 'D' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
 [Mv,Q,glo_num]=set_mask(BC_all(2,:),Nelx,Nely,Q,glo_num);
@@ -114,7 +127,7 @@ BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 0 - 0*X;   %% Initial conditions
+U = 1 - 0*X;   %% Initial conditions
 V = 0 + 0*X;
 T = 0 + 0*X;
 
@@ -133,7 +146,6 @@ end
 interpdata_top
 ##plot(X(:,1:Nelx,1), Y(:,1:Nelx,1), 'g')
 
-##pause;
 
 end
 

@@ -33,8 +33,11 @@ rho1=1; rtz1=1; r=Fl; x=0*r; p=x;
 d=zeros(max_iter,1); l=d; u=d; %% For eigenvalue estimates
 
 for iter=1:max_iter;
-
+   r = r - mean(mean(mean(r)))*ones(size(r));
    z=dA.*(M.*qqt(Q,r));   %% diagonal preconditioner
+
+   zmean = mean(mean(mean(z)))*ones(size(z));
+   z = z -  zmean;
    rtz0 = rtz1; rtz1=sum(sum(sum(z.*r))); beta=rtz1/rtz0;
    res=sqrt(rtz1);
    if res < tol; break; end;
@@ -43,6 +46,7 @@ for iter=1:max_iter;
    w=axl(p,b0,nu,Bl,Grr,Grs,Gss,Dh);
    rho0 = rho1; rho1 = sum(sum(sum(p.*w))); alpha = rtz1/rho1;
    x=x+alpha*p;
+
    r=r-alpha*w;
 
    if iter==1;
@@ -54,12 +58,13 @@ for iter=1:max_iter;
 end;
 
 
+
 if iter<max_iter; iter=iter-1; end;
 
 
 d=d(1:iter); l=l(1:iter); u(2:iter)=l(1:iter-1); u=u(1:iter);
 T=spdiags([l d u],-1:1,iter,iter); T=full(T);
-d=eig(T); 
+d=eig(T);
 lam_min=min(d);
 lam_max=max(d);
 
@@ -71,4 +76,3 @@ if lam_min > 0; condition = lam_max / lam_min; pause(.1), end;
 % disp([iter res lam_min lam_max condition])
 
 pause(.1)
-

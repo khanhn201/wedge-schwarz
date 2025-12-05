@@ -1,23 +1,11 @@
-function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA]...
-             = set_sem_all_tip(N);
+function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA,interpdata_tip]...
+             = set_sem_all_tipv03(N);
 
 hdr;    % 2-D SEM multi-element
 
-##Nelx = 2;  Nely = 2; E = Nelx*Nely;
+Nelx = 2;  Nely = 2; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
-
-
-##%% Circular Geometry
-##x0 =  -1.5;  x1=-x0;  Lx=x1-x0;   % Domain coordinates and size
-##y0 =   1.0;  y1=1.5;  Ly=y1-y0;
-##
-##%% Base Geometry
-##x0 =   0.0;  x1=2.;  Lx=x1-x0;   % Domain coordinates and size
-##y0 =  -0.5;  y1=1.5;  Ly=y1-y0;
-##
-##zc = zwuni(Nelx); xc = x0 + Lx*(zc+1)/2;
-##zc = zwuni(Nely); yc = y0 + Ly*(zc+1)/2;
 
 %% Problem parameters, as function of N
 
@@ -27,121 +15,79 @@ N1=N+1;
 [z,w]=zwgll(N);                % Set basic operators
 Dh=deriv_mat(z);
 
-E = 3;
 [R,S]=ndgrid(z,z);             % Build SEM mesh
 X=zeros(N1,E,N1); Y=X;
+
+
 e=0;
-% geometric control
-alpha = 28.5/2 * pi/180;         % half-aperture angle in radians
-y_top = 1.0;                   % top of trapezoid
-y_mid = 0.0;                   % interface between trapezoid and kite
-y_bot = -1.0;                  % apex (bottom)
-bend  = 0.2;                   % inward bending of top centerline (optional)
-
-% slopes from apex (constant on both sides)
-half_width = @(y) abs(y - y_bot) * tan(alpha);
-
-% -------------------------------------------------------------------------
-% === (1) Bent trapezoid: two halves merged together ===
-% Compute key widths from slope
-w_top = 2 * half_width(y_top);   % total width at top
-w_mid = 2 * half_width(y_mid);   % total width at interface
-
-% Left trapezoid
-x1L = -w_mid/2;  y1L = y_mid;
-x4L = -w_top/2;  y4L = y_top - 0.25;    % slightly shorter top
-x3L =  0*bend;   y3L = y_top;           % inward bent top
-x2L =  0.0;      y2L = y_mid + 0.5;     % joint centerline
-
-X_L = 0.25*((1-R).*(1-S)*x1L + (1+R).*(1-S)*x2L + ...
-            (1+R).*(1+S)*x3L + (1-R).*(1+S)*x4L);
-Y_L = 0.25*((1-R).*(1-S)*y1L + (1+R).*(1-S)*y2L + ...
-            (1+R).*(1+S)*y3L + (1-R).*(1+S)*y4L);
-
-% Right trapezoid (mirror)
-x1R =  w_mid/2;  y1R = y_mid;
-x2R =  w_top/2;  y2R = y_top - 0.25;
-x3R = 0*-bend;     y3R = y_top;
-x4R =  0.0;      y4R = y_mid + 0.5;
-
-X_R = 0.25*((1-R).*(1-S)*x1R + (1+R).*(1-S)*x2R + ...
-            (1+R).*(1+S)*x3R + (1-R).*(1+S)*x4R);
-Y_R = 0.25*((1-R).*(1-S)*y1R + (1+R).*(1-S)*y2R + ...
-            (1+R).*(1+S)*y3R + (1-R).*(1+S)*y4R);
-
-% -------------------------------------------------------------------------
-% === (2) Kite / apex element ===
-% Ensure edges follow same slope
-x1K = 0.0;        y1K = y_bot;       % bottom tip (apex)
-x2K = half_width(y_mid);   y2K = y_mid;       % right joint
-x3K = 0.0;        y3K = y_mid + 0.5; % upper center of kite
-x4K = -half_width(y_mid);  y4K = y_mid;       % left joint
-
-X_K = 0.25*((1-R).*(1-S)*x1K + (1+R).*(1-S)*x2K + ...
-            (1+R).*(1+S)*x3K + (1-R).*(1+S)*x4K);
-Y_K = 0.25*((1-R).*(1-S)*y1K + (1+R).*(1-S)*y2K + ...
-            (1+R).*(1+S)*y3K + (1-R).*(1+S)*y4K);
-
-% -------------------------------------------------------------------------
-% Plot everything
-% -------------------------------------------------------------------------
-##figure; hold on; axis equal; box on;
-##
-##% top trapezoid (left + right)
-##plot(X_L, Y_L, 'k'); plot(X_L', Y_L', 'k');
-##plot(X_R, Y_R, 'k'); plot(X_R', Y_R', 'k');
-##
-##% bottom kite
-##plot(X_K, Y_K, 'k'); plot(X_K', Y_K', 'k');
-##
-##% x_test= l
-##
-##xlabel('x'); ylabel('y');
-##title(sprintf('Wedge Mesh with Aperture α = %.1f°', 28.5));
-
-X(:,1,:)= X_K; Y(:,1,:) = Y_K;
-X(:,2,:)= X_L; Y(:,2,:) = Y_L;
-X(:,3,:)= X_R; Y(:,3,:) = Y_R;
 
 
- figure; hold on; axis equal;
- for e = 1:E
-     % Extract patch for element e
-     Xe = squeeze(X(:,e,:));
-     Ye = squeeze(Y(:,e,:));
-     % Plot grid lines
-     plot(Xe, Ye, 'k-');           % lines along R
-     plot(Xe', Ye', 'k-');         % lines along S
+for ey=1:Nely; for ex=1:Nelx; e=e+1;
+    function rb = bottom(r)
+        rb = [r,-1];
 
-     node_id = 0;
-     for j = 1:N1; for i = 1:N1;
-       node_id = node_id +1;
-       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-     end;end
-     xc = mean(Xe(:));
-     yc = mean(Ye(:));
+    end
+    function rb = top(r)
+        rb = [r,1];
+    end
+    function rb = blend(r, s)
+        rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;
+    end
 
-     % add element number
-     text(xc, yc, num2str(e), ...
-          'HorizontalAlignment','center', ...
-          'VerticalAlignment','middle', ...
-          'FontWeight','bold', ...
-          'Color','r');
+    r00 = blend((ex-1)/Nelx*2-1, (ey-1)/Nely*2-1);
+    r10 = blend((ex)/Nelx*2-1, (ey-1)/Nely*2-1);
+    r01 = blend((ex-1)/Nelx*2-1, (ey)/Nely*2-1);
+    r11 = blend((ex)/Nelx*2-1, (ey)/Nely*2-1);
 
- end
- pause;
+    xe00 = r00(1);  ye00 = r00(2);
+    xe10 = r10(1);  ye10 = r10(2);
+    xe01 = r01(1);  ye01 = r01(2);
+    xe11 = r11(1);  ye11 = r11(2);
+
+    X(:,e,:) = (xe00 + (xe10-xe00).*(R+1)/2) .* (-S+1)/2 ...
+             + (xe01 + (xe11-xe01).*(R+1)/2) .* (1+S)/2;
+    Y(:,e,:) = (ye00 + (ye10-ye00).*(R+1)/2) .* (-S+1)/2 ...
+             + (ye01 + (ye11-ye01).*(R+1)/2) .* (1+S)/2;
+end; end;
+
+## figure; hold on; axis equal;
+## for e = 1:E
+##     % Extract patch for element e
+##     Xe = squeeze(X(:,e,:));
+##     Ye = squeeze(Y(:,e,:));
+##     % Plot grid lines
+##     plot(Xe, Ye, 'k-');           % lines along R
+##     plot(Xe', Ye', 'k-');         % lines along S
+
+##     node_id = 0;
+##     for j = 1:N1; for i = 1:N1;
+##       node_id = node_id +1;
+##       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+##     end;end
+##     xc = mean(Xe(:));
+##     yc = mean(Ye(:));
+
+##     % add element number
+##     text(xc, yc, num2str(e), ...
+##          'HorizontalAlignment','center', ...
+##          'VerticalAlignment','middle', ...
+##          'FontWeight','bold', ...
+##          'Color','r');
+
+## end
+## pause;
 
  % [X,Y]=morph_circ(X,Y);         % Morph mesh
 
 [Grr,Grs,Gss,Bl,Xr,Rx,Jac]=geom_elem(X,Y,Dh,w); % Terms for "A"
 vol = sum(sum(sum(Bl)))
-[Q,glo_num]=set_tp_semq_tip(N);
+[Q,glo_num]=set_tp_semq(Nelx,Nely,N);
 
 
-BC_all = [ 'D' 'N' 'D' 'D' ;     %% U
-           'D' 'N' 'D' 'D' ;     %% V
-           'N' 'D' 'N' 'N' ;     %% P
-           'D' 'N' 'N' 'N' ];    %% T
+BC_all = [ 'D' 'D' 'D' 'D' ;     %% U
+           'D' 'D' 'D' 'D' ;     %% V
+           'N' 'N' 'N' 'N' ;     %% P
+           'N' 'D' 'N' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
 [Mv,Q,glo_num]=set_mask(BC_all(2,:),Nelx,Nely,Q,glo_num);
@@ -152,8 +98,59 @@ BC_all = [ 'D' 'N' 'D' 'D' ;     %% U
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 1 + 0*X;   %% Initial conditions
+U = 0 + 0*X;   %% Initial conditions
 V = 0 + 0*X;
 T = 0 + 0*X;
+
+
+% Store overlapping interpolation points
+printf('**** Interpolation points at the tip part *****\n')
+interpdata_tip = [];
+n = 0;
+for k = E-Nelx+1:E
+   j = N1;
+   for i = 1:size(X,1)
+       n = n+1;
+       interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
+   end
+end
+for k = Nelx:Nelx:E
+   i = N1;
+   for j = 1:size(Y,1)
+       n = n+1;
+       interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
+   end
+end
+
+for k = 1:Nelx
+   j = 1;
+   for i = 1:size(X,1)
+       n = n+1;
+       interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
+   end
+end
+for k =1:Nelx:E
+   i = 1;
+   for j = 1:size(Y,1)
+       n = n+1;
+       interpdata_tip = [interpdata_tip ; k, i,j, X(i,k,j), Y(i,k,j)];
+   end
+end
+
+
+
+interpdata_tip
+##plot(X(N1,2,:), Y(N1,2,:), 'g')
+##hold on;
+##plot(X(:,3,N1), Y(:,3,N1), 'g')
+##plot(X(N1,4,:), Y(N1,4,:), 'g')
+##plot(X(:,4,N1), Y(:,4,N1), 'g')
+##hold off;
+##size(interpdata_tip)
+##pause
+##hold on;
+##plot(interpdata_tip(:,4), interpdata_tip(:,5), '*');
+##
+##pause;
 end
 

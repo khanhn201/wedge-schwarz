@@ -23,7 +23,6 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
      j0=1; if ey>1; j0=2;
         glo_num(:,e,1) = glo_num(:,e-Nelx,N1);
      end;
-
      for j=j0:N1; for i=i0:N1;
         n=n+1;
         glo_num(i,e,j) = n;
