@@ -1,5 +1,4 @@
 function [Fx_total, Fy_total] = compute_drag_lift(U,V,P,nu,Xr,Rx,Dh,w)
-sidx = 1; % bottom wall
 Fx_total = 0;
 Fy_total = 0;
 [dUdx,dUdy] = grad(U, Rx, Dh);
@@ -8,9 +7,12 @@ tau_xx = -P + 2*nu.*dUdx;
 tau_xy =     nu.*(dUdy + dVdx);
 tau_yy = -P + 2*nu.*dVdy;
 
+Nelx = 16;
+
+sidx = 1; % bottom wall
 for r = 1:size(U, 1)
   wr = w(r);
-  for e = 1:size(U, 2)
+  for e = 1:Nelx
     tx = Xr(r,e,sidx,1,1); % dx/dr
     ty = Xr(r,e,sidx,2,1); % dy/dr
     tnorm = sqrt(tx^2 + ty^2);

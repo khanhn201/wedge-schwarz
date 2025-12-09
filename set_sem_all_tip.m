@@ -1,9 +1,9 @@
 function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,BC_all,dA,interpdata_tip]...
-             = set_sem_all_tipv03(N);
+             = set_sem_all_tip(N);
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 16;  Nely = 2; E = Nelx*Nely;
+Nelx = 16;  Nely = 4; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -28,7 +28,7 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
 
     end
     function rb = top(r)
-           rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*2.0;
+           rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*2.5;
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;

@@ -3,7 +3,7 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=6;
+N=4;
 
 
 nu=1.0/20.0; alpha=1.e-0;
@@ -30,19 +30,19 @@ omegx = -Y_tip; omegy = X_tip;
 %     plot(Xe', Ye', 'b-');         % lines along S
 %
 %      node_id = 0;
-%      % for j = 1:N1; for i = 1:N1;
-%      %   node_id = node_id +1;
-%      %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%      % end;end
+%      for j = 1:N1; for i = 1:N1;
+%        node_id = node_id +1;
+%        text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%      end;end
 %      xc = mean(Xe(:));
 %      yc = mean(Ye(:));
 %
 % ##     add element number
-%      % text(xc, yc, num2str(e), ...
-%      %      'HorizontalAlignment','center', ...
-%      %      'VerticalAlignment','middle', ...
-%      %      'FontWeight','bold', ...
-%      %      'Color','r');
+%      text(xc, yc, num2str(e), ...
+%           'HorizontalAlignment','center', ...
+%           'VerticalAlignment','middle', ...
+%           'FontWeight','bold', ...
+%           'Color','r');
 %
 %  end
 %
@@ -55,19 +55,19 @@ omegx = -Y_tip; omegy = X_tip;
 %     plot(Xe', Ye', 'r-');         % lines along S
 %
 %      node_id = 0;
-%      % for j = 1:N1; for i = 1:N1;
-%      %   node_id = node_id +1;
-%      %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%      % end;end
+%      for j = 1:N1; for i = 1:N1;
+%        node_id = node_id +1;
+%        text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%      end;end
 %      xc = mean(Xe(:));
 %      yc = mean(Ye(:));
 %
 %      % add element number
-%      % text(xc, yc, num2str(e), ...
-%      %      'HorizontalAlignment','center', ...
-%      %      'VerticalAlignment','middle', ...
-%      %      'FontWeight','bold', ...
-%      %      'Color','r');
+%      text(xc, yc, num2str(e), ...
+%           'HorizontalAlignment','center', ...
+%           'VerticalAlignment','middle', ...
+%           'FontWeight','bold', ...
+%           'Color','r');
 %
 %  end
 %  pause;
@@ -105,8 +105,16 @@ for iloop=1:1;
   for istep =1:nsteps; k=k+1;
 
         time = time + dt
-        %% Interpolation nodes
 
+        x_interp_tip = interpdata_tip(:,4);
+        y_interp_tip = interpdata_tip(:,5);
+        [Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip] = interpolate(x_interp_tip,y_interp_tip,X,Y,U,V,P,T,z);
+        %Solve for a tip
+        [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
+                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/1.0,JM_tip,DM_tip,BMh_tip, ...
+                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip, omegx, omegy);
+
+        %% Interpolation nodes
         x_interp_top = interpdata_top(:,4);
         y_interp_top = interpdata_top(:,5);
         [Uinterp_top,Vinterp_top,Pinterp_top,Tinterp_top] = interpolate(x_interp_top,y_interp_top,X_tip,Y_tip,U_tip,V_tip,P_tip,T_tip,z_tip);
@@ -114,18 +122,6 @@ for iloop=1:1;
         %Solve 1 timestep for top
         [U,V,P,T] = solve_2dnse(N,U,V,P,T,Dh,X,Y,Grr,Grs,Gss,Bl,Rx,Jac,Q,Mu,Mv,Mp,Mt,ifnull,unxa_v,unya_v,dA,dt,JM,DM,BMh,istep,nu,alpha, ...
                                Uinterp_top,Vinterp_top,Pinterp_top,Tinterp_top,interpdata_top);
-
-        x_interp_tip = interpdata_tip(:,4);
-        y_interp_tip = interpdata_tip(:,5);
-        [Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip] = interpolate(x_interp_tip,y_interp_tip,X,Y,U,V,P,T,z);
-
-
-        %Solve for a tip
-        for k = 1:1
-        [U_tip,V_tip,P_tip,T_tip] = solve_2dnse_tip(N,U_tip,V_tip,P_tip,T_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Rx_tip,Jac_tip,Q_tip,...
-                                               Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip,unxa_v_tip,unya_v_tip,dA_tip,dt/1.0,JM_tip,DM_tip,BMh_tip, ...
-                                               istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip, omegx, omegy);
-        end
 
         c = cos(dt);
         s = sin(dt);
