@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 8;  Nely = 2; E = Nelx*Nely;
+Nelx = 16;  Nely = 8; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -24,7 +24,7 @@ e=0;
 
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-           rb = [0.1*cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*0.5;
+           rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*0.5;
 
     end
     function rb = top(r)
@@ -86,7 +86,7 @@ vol = sum(sum(sum(Bl)))
 
 BC_all = [ 'P' 'P' 'D' 'D' ;     %% U
            'P' 'P' 'D' 'D' ;     %% V
-           'P' 'P' 'N' 'D' ;     %% P
+           'P' 'P' 'N' 'N' ;     %% P
            'N' 'D' 'N' 'D' ];    %% T
 
 [Mu,Q,glo_num]=set_mask(BC_all(1,:),Nelx,Nely,Q,glo_num);
@@ -98,7 +98,7 @@ BC_all = [ 'P' 'P' 'D' 'D' ;     %% U
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 0 + 0*X;   %% Initial conditions
+U = 1 + 0*X;   %% Initial conditions
 V = 0 + 0*X;
 T = 0 + 0*X;
 

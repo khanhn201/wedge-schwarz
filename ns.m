@@ -3,10 +3,10 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=8;
+N=4;
 
 
-nu=5e-3; alpha=1.e-0;
+nu=1.0/200.0; alpha=1.e-0;
 
 Re=1./nu;
 
@@ -15,7 +15,7 @@ Re=1./nu;
 
 [U_tip,V_tip,T_tip,z_tip,w_tip,Dh_tip,X_tip,Y_tip,Grr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip, ...
 Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
-unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tip(5);
+unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tip(4);
 
 omegx = -Y_tip; omegy = X_tip;
 ###Plot mesh
@@ -105,7 +105,7 @@ for iloop=1:1;
   figure;
   for istep =1:nsteps; k=k+1;
 
-        time = time + dt;
+        time = time + dt
         %% Interpolation nodes
 
         x_interp_top = interpdata_top(:,4);
@@ -141,6 +141,8 @@ for iloop=1:1;
         if (1 ==1);
 
   %      disp([itp itu itv itt])
+        [Fx_total, Fy_total] = compute_drag_lift(U_tip,V_tip,P_tip,nu,Xr_tip,Rx_tip,Dh_tip,w_tip);
+        Fy_total
 
          hold off;
 
@@ -150,7 +152,6 @@ for iloop=1:1;
 
          % s=['Time,UVT_{max}: ' num2str(time) ',   ' num2str(tmax) ,...
          %    ', ' num2str(istep)'.'];
-         s='Time'
 ##          se_mesh  (X,Y,P,s);hold on;
 ##          se_mesh  (X_tip,Y_tip,P_tip,s);zlim([-0.3,0.3])
          % hold off; se_quiver(X,Y,U,V,s);  axis equal; hold on;
