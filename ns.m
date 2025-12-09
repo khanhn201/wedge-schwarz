@@ -20,7 +20,6 @@ unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tip(4);
 omegx = -Y_tip; omegy = X_tip;
 #Plot mesh
 % E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
-%
 % figure; hold on; axis equal;
 % for e = 1:E1
 %     %Extract patch for element e
@@ -31,19 +30,19 @@ omegx = -Y_tip; omegy = X_tip;
 %     plot(Xe', Ye', 'b-');         % lines along S
 %
 %      node_id = 0;
-%      for j = 1:N1; for i = 1:N1;
-%        node_id = node_id +1;
-%        text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%      end;end
+%      % for j = 1:N1; for i = 1:N1;
+%      %   node_id = node_id +1;
+%      %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%      % end;end
 %      xc = mean(Xe(:));
 %      yc = mean(Ye(:));
 %
 % ##     add element number
-%      text(xc, yc, num2str(e), ...
-%           'HorizontalAlignment','center', ...
-%           'VerticalAlignment','middle', ...
-%           'FontWeight','bold', ...
-%           'Color','r');
+%      % text(xc, yc, num2str(e), ...
+%      %      'HorizontalAlignment','center', ...
+%      %      'VerticalAlignment','middle', ...
+%      %      'FontWeight','bold', ...
+%      %      'Color','r');
 %
 %  end
 %
@@ -56,19 +55,19 @@ omegx = -Y_tip; omegy = X_tip;
 %     plot(Xe', Ye', 'r-');         % lines along S
 %
 %      node_id = 0;
-%      for j = 1:N1; for i = 1:N1;
-%        node_id = node_id +1;
-%        text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-%      end;end
+%      % for j = 1:N1; for i = 1:N1;
+%      %   node_id = node_id +1;
+%      %   text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%      % end;end
 %      xc = mean(Xe(:));
 %      yc = mean(Ye(:));
 %
 %      % add element number
-%      text(xc, yc, num2str(e), ...
-%           'HorizontalAlignment','center', ...
-%           'VerticalAlignment','middle', ...
-%           'FontWeight','bold', ...
-%           'Color','r');
+%      % text(xc, yc, num2str(e), ...
+%      %      'HorizontalAlignment','center', ...
+%      %      'VerticalAlignment','middle', ...
+%      %      'FontWeight','bold', ...
+%      %      'Color','r');
 %
 %  end
 %  pause;
@@ -81,7 +80,7 @@ omegx = -Y_tip; omegy = X_tip;
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-2; nsteps=999;
+dt=1e-1; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -197,7 +196,8 @@ for iloop=1:1;
 ##         v_all = v_all ./ mag;
          scatter(x_all, y_all, 10, mag, 'filled'); hold on;
          colormap(jet);
-        quiver(x_all, y_all, u_all, v_all, 'k');drawnow;
+        quiver(x_all, y_all, u_all, v_all, 'k');
+        drawnow;
 
 
 

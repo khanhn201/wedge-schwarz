@@ -35,7 +35,7 @@ e=0;
 h = 0.35;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)];
+        rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*1.75;
     end
     function rb = top(r)
         if r <= -0.5
@@ -49,7 +49,7 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
         end
         rb(:) = rb(:)*10;
 
-       rb(1)= rb(1)*2;
+       % rb(1)= rb(1)*2;
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;
@@ -120,8 +120,8 @@ Uinf = 1;           % farfield speed
 a = 0.5;             % cylinder radius
 r = sqrt(X.^2 + Y.^2);
 theta = atan2(Y, X);
-vr = Uinf .* (1 - (a.^2) ./ (r.^2));
-vtheta = - Uinf .* (1 + (a.^2) ./ (r.^2));
+vr = Uinf .* (1 - (a.^2) ./ (r.^2)).*cos(theta);
+vtheta = - Uinf .* (1 + (a.^2) ./ (r.^2)).*sin(theta);
 
 U = vr .* cos(theta) - vtheta .* sin(theta);
 V = vr .* sin(theta) + vtheta .* cos(theta);
