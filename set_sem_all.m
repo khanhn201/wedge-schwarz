@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 16;  Nely = 16; E = Nelx*Nely;
+Nelx = 8;  Nely = 4; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -116,8 +116,18 @@ BC_all = [ 'P' 'P' 'D' 'D' ;     %% U
 
 dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
-U = 1 - 0*X;   %% Initial conditions
-V = 0 + 0*X;
+Uinf = 1;           % farfield speed
+a = 0.5;             % cylinder radius
+r = sqrt(X.^2 + Y.^2);
+theta = atan2(Y, X);
+vr = Uinf .* (1 - (a.^2) ./ (r.^2));
+vtheta = - Uinf .* (1 + (a.^2) ./ (r.^2));
+
+U = vr .* cos(theta) - vtheta .* sin(theta);
+V = vr .* sin(theta) + vtheta .* cos(theta);
+
+% U = 1 - 0*X;   %% Initial conditions
+% V = 0 + 0*X;
 T = 0 + 0*X;
 
 

@@ -6,7 +6,7 @@ close all;
 N=4;
 
 
-nu=1.0/200.0; alpha=1.e-0;
+nu=1.0/5.0; alpha=1.e-0;
 
 Re=1./nu;
 
@@ -18,60 +18,60 @@ Jac_tip,Q_tip,glo_num_tip,Mu_tip,Mv_tip,Mp_tip,Mt_tip,ifnull_tip, ...
 unxa_v_tip,unya_v_tip,BC_all_tip,dA_tip,interpdata_tip]=set_sem_all_tip(4);
 
 omegx = -Y_tip; omegy = X_tip;
-###Plot mesh
-##E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
-##
-##figure; hold on; axis equal;
-##for e = 1:E1
-##    %Extract patch for element e
-##    Xe = squeeze(X(:,e,:));
-##    Ye = squeeze(Y(:,e,:));
-##    %Plot grid lines
-##    plot(Xe, Ye, 'b-');           % lines along R
-##    plot(Xe', Ye', 'b-');         % lines along S
-##
-##     node_id = 0;
-##     for j = 1:N1; for i = 1:N1;
-##       node_id = node_id +1;
-##       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-##     end;end
-##     xc = mean(Xe(:));
-##     yc = mean(Ye(:));
-##
-####     add element number
-##     text(xc, yc, num2str(e), ...
-##          'HorizontalAlignment','center', ...
-##          'VerticalAlignment','middle', ...
-##          'FontWeight','bold', ...
-##          'Color','r');
-##
-## end
-##
-## for e = 1:E2
-##    %Extract patch for element e
-##    Xe = squeeze(X_tip(:,e,:));
-##    Ye = squeeze(Y_tip(:,e,:));
-##    %Plot grid lines
-##    plot(Xe, Ye, 'r-');           % lines along R
-##    plot(Xe', Ye', 'r-');         % lines along S
-##
-##     node_id = 0;
-##     for j = 1:N1; for i = 1:N1;
-##       node_id = node_id +1;
-##       text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
-##     end;end
-##     xc = mean(Xe(:));
-##     yc = mean(Ye(:));
-##
-##     % add element number
-##     text(xc, yc, num2str(e), ...
-##          'HorizontalAlignment','center', ...
-##          'VerticalAlignment','middle', ...
-##          'FontWeight','bold', ...
-##          'Color','r');
-##
-## end
-## pause;
+#Plot mesh
+% E1 = size(X,2); E2 = size(X_tip,2); N1 = N+1;
+%
+% figure; hold on; axis equal;
+% for e = 1:E1
+%     %Extract patch for element e
+%     Xe = squeeze(X(:,e,:));
+%     Ye = squeeze(Y(:,e,:));
+%     %Plot grid lines
+%     plot(Xe, Ye, 'b-');           % lines along R
+%     plot(Xe', Ye', 'b-');         % lines along S
+%
+%      node_id = 0;
+%      for j = 1:N1; for i = 1:N1;
+%        node_id = node_id +1;
+%        text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%      end;end
+%      xc = mean(Xe(:));
+%      yc = mean(Ye(:));
+%
+% ##     add element number
+%      text(xc, yc, num2str(e), ...
+%           'HorizontalAlignment','center', ...
+%           'VerticalAlignment','middle', ...
+%           'FontWeight','bold', ...
+%           'Color','r');
+%
+%  end
+%
+%  for e = 1:E2
+%     %Extract patch for element e
+%     Xe = squeeze(X_tip(:,e,:));
+%     Ye = squeeze(Y_tip(:,e,:));
+%     %Plot grid lines
+%     plot(Xe, Ye, 'r-');           % lines along R
+%     plot(Xe', Ye', 'r-');         % lines along S
+%
+%      node_id = 0;
+%      for j = 1:N1; for i = 1:N1;
+%        node_id = node_id +1;
+%        text(Xe(i,j), Ye(i,j),num2str(node_id), 'fontsize',14);
+%      end;end
+%      xc = mean(Xe(:));
+%      yc = mean(Ye(:));
+%
+%      % add element number
+%      text(xc, yc, num2str(e), ...
+%           'HorizontalAlignment','center', ...
+%           'VerticalAlignment','middle', ...
+%           'FontWeight','bold', ...
+%           'Color','r');
+%
+%  end
+%  pause;
 %% Set dealiasing operators, JM,DM,BMh
 [JM,DM,BMh,Jf,dt] = set_dealiasing(N,z,Jac,U,V,Rx);
 [JM_tip,DM_tip,BMh_tip,Jf_tip,dt] = set_dealiasing(N,z_tip,Jac_tip,U_tip,V_tip,Rx_tip);
@@ -130,6 +130,15 @@ for iloop=1:1;
 
         X_tip = X_tip+omegx*dt;
         Y_tip = Y_tip+omegy*dt;
+        I1 = interpdata_tip(:,2);
+        I2 = interpdata_tip(:,1);
+        I3 = interpdata_tip(:,3);
+
+        idx_x = sub2ind(size(omegx), I1, I2, I3);
+        idx_y = sub2ind(size(omegy), I1, I2, I3);
+
+        interpdata_tip(:,4) += omegx(idx_x) * dt;
+        interpdata_tip(:,5) += omegy(idx_y) * dt;
 
         omegx = -Y_tip;
         omegy = X_tip;
