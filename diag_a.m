@@ -3,8 +3,6 @@ function da = diag_a(Grr,Grs,Gss,Dr,Ds);
 nr=size(Dr,1);
 ns=size(Ds,1);
 
-size(Dr)
-size(Grr)
 da = (Dr.*Dr)'*Grr + Gss*(Ds.*Ds);
 
 da(  1,  1) = da(  1,  1)+Grs(  1,  1)*Dr(  1,  1)*Ds(  1,  1)*2;

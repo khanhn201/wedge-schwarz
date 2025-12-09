@@ -6,7 +6,7 @@ close all;
 N=6;
 
 
-nu=1.0/5.0; alpha=1.e-0;
+nu=1.0/20.0; alpha=1.e-0;
 
 Re=1./nu;
 
@@ -80,7 +80,7 @@ omegx = -Y_tip; omegy = X_tip;
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-1; nsteps=999;
+dt=1e-2; nsteps=999;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -142,6 +142,10 @@ for iloop=1:1;
 
         omegx = -Y_tip;
         omegy = X_tip;
+
+        [Gr_tip,Grs_tip,Gss_tip,Bl_tip,Xr_tip,Rx_tip,Jac_tip]=geom_elem(X_tip,Y_tip,Dh_tip,w_tip); % Terms for "A"
+        [unxa_v_tip,unya_v_tip] = set_unxy(Mu_tip,X_tip,Y_tip,Xr_tip);
+        dA_tip=diag_sem(Grr_tip,Grs_tip,Gss_tip,Dh_tip); dA_tip=qqt(Q_tip,dA_tip); dA_tip=1./dA_tip;
   %    Diagonostics
 ##        U = U_tip; V = V_tip; P = P_tip; T = T_tip;
 ##        X = X_tip; Y = Y_tip; Jf = Jf_tip;

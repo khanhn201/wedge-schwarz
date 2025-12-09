@@ -3,7 +3,7 @@ function [U,V,T,z,w,Dh,X,Y,Grr,Grs,Gss,Bl,Xr,Rx,Jac,Q,glo_num,Mu,Mv,Mp,Mt,ifnull
 
 hdr;    % 2-D SEM multi-element
 
-Nelx = 8;  Nely = 4; E = Nelx*Nely;
+Nelx = 16;  Nely = 4; E = Nelx*Nely;
 % Nelx = 1;  Nely = 1; E = Nelx*Nely;
 N1=N+1;
 
@@ -35,7 +35,7 @@ e=0;
 h = 0.35;
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-        rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*1.75;
+        rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*1.25;
     end
     function rb = top(r)
         if r <= -0.5
