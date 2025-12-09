@@ -49,7 +49,7 @@ for ey=1:Nely; for ex=1:Nelx; e=e+1;
         end
         rb(:) = rb(:)*10;
 
-       % rb(1)= rb(1)*2;
+       rb(1)= rb(1)*2;
     end
     function rb = blend(r, s)
         rb = top(r)*(s+1.0)/2.0 + bottom(r)*(-s+1.0)/2.0;

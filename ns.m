@@ -3,7 +3,7 @@ clear all
 hdr;    % 2-D SEM multi-element
 close all;
 
-N=4;
+N=6;
 
 
 nu=1.0/5.0; alpha=1.e-0;
@@ -127,17 +127,18 @@ for iloop=1:1;
                                                istep, nu, alpha,Uinterp_tip,Vinterp_tip,Pinterp_tip,Tinterp_tip,interpdata_tip, omegx, omegy);
         end
 
-        X_tip = X_tip+omegx*dt;
-        Y_tip = Y_tip+omegy*dt;
-        I1 = interpdata_tip(:,2);
-        I2 = interpdata_tip(:,1);
-        I3 = interpdata_tip(:,3);
+        c = cos(dt);
+        s = sin(dt);
+  
+        Xnew =  c*X_tip - s*Y_tip;
+        Ynew =  s*X_tip + c*Y_tip;
+        X_tip = Xnew;
+        Y_tip = Ynew;
 
-        idx_x = sub2ind(size(omegx), I1, I2, I3);
-        idx_y = sub2ind(size(omegy), I1, I2, I3);
-
-        interpdata_tip(:,4) += omegx(idx_x) * dt;
-        interpdata_tip(:,5) += omegy(idx_y) * dt;
+        Xintnew = c*interpdata_tip(:,4) - s*interpdata_tip(:,5);
+        Yintnew = s*interpdata_tip(:,4) + c*interpdata_tip(:,5);
+        interpdata_tip(:,4) = Xintnew;
+        interpdata_tip(:,5) = Yintnew;
 
         omegx = -Y_tip;
         omegy = X_tip;
