@@ -1,4 +1,4 @@
-function [Fx_total, Fy_total] = compute_drag_lift(U,V,P,nu,Xr,Rx,Dh,w)
+function [Fx_total, Fy_total] = compute_drag_lift(U,V,P,nu,Xr,Rx,Dh,w, unxa_v, unya_v)
 Fx_total = 0;
 Fy_total = 0;
 [dUdx,dUdy] = grad(U, Rx, Dh);
@@ -13,16 +13,12 @@ sidx = 1; % bottom wall
 for r = 1:size(U, 1)
   wr = w(r);
   for e = 1:Nelx
-    tx = Xr(r,e,sidx,1,1); % dx/dr
-    ty = Xr(r,e,sidx,2,1); % dy/dr
-    tnorm = sqrt(tx^2 + ty^2);
-    if tnorm == 0; continue; end
-    nx =  ty/tnorm; ny = -tx/tnorm;   % outward unit normal candidate
+    nx =  -unxa_v(r,e,sidx);
+    ny =  -unya_v(r,e,sidx);
     % traction components at (r,e,sidx)
     T_x = tau_xx(r,e,sidx)*nx + tau_xy(r,e,sidx)*ny;
     T_y = tau_xy(r,e,sidx)*nx + tau_yy(r,e,sidx)*ny;
-    dS = tnorm * wr; % physical line element
-    Fx_total = Fx_total + T_x * dS;
-    Fy_total = Fy_total + T_y * dS;
+    Fx_total = Fx_total + T_x;
+    Fy_total = Fy_total + T_y;
   end
 end
