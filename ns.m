@@ -6,7 +6,7 @@ close all;
 N=4;
 
 
-nu=1.0/20.0; alpha=1.e-0;
+nu=1.0/100.0; alpha=1.e-0;
 
 Re=1./nu;
 
@@ -80,7 +80,7 @@ omegx = -Y_tip; omegy = X_tip;
 
 Tfinal = 4*pi; nsteps = ceil(Tfinal/dt)
 dt = Tfinal/nsteps;
-dt=1e-2; nsteps=999;
+dt=5e-3; nsteps=10000;
 
 %% Initialize BDFk/EXTk arrays
 
@@ -98,6 +98,9 @@ P_tip= 0*X_tip;
 ifnull=0; tol=1.e-6; max_iter=140;
 
 %%%%% TIME STEPPING LOOP %%%%%%
+times = [];
+lifts = [];
+file_id = 0;
 
 kk=0; k=0; time=0;
 for iloop=1:1;
@@ -152,6 +155,8 @@ for iloop=1:1;
   %      disp([itp itu itv itt])
         [Fx_total, Fy_total] = compute_drag_lift(U_tip,V_tip,P_tip,nu,Xr_tip,Rx_tip,Dh_tip,w_tip);
         Fy_total
+        times = [times; time];
+        lifts = [lifts; Fy_total];
 
          hold off;
 
@@ -201,6 +206,15 @@ for iloop=1:1;
         drawnow;
 
 
+    if mod(istep, 10) == 0 || istep == 1
+        file_id = file_id + 1;
+
+        fname = sprintf('ar05/c%06d.mat', file_id);
+        save(fname);
+
+        fprintf('Saved: %s at istep = %d, t = %.6f\n', ...
+                fname, istep, time);
+    end
 
 
   ##       hold on; se_quiver(Xf,Yf,U3plt,V3plt,s); drawnow;pause(0.1);

@@ -24,7 +24,7 @@ e=0;
 
 for ey=1:Nely; for ex=1:Nelx; e=e+1;
     function rb = bottom(r)
-           rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)]*0.5;
+           rb = [cos((r+1)*pi-3*pi/4),-sin((r+1)*pi-3*pi/4)*0.5]*0.5;
 
     end
     function rb = top(r)
@@ -101,7 +101,7 @@ dA=diag_sem(Grr,Grs,Gss,Dh); dA=qqt(Q,dA); dA=1./dA;
 
 Uinf = 1;           % farfield speed
 a = 0.5;             % cylinder radius
-r = sqrt(X.^2 + Y.^2);
+r = sqrt(X.^2 + (Y./0.5).^2);
 theta = atan2(Y, X);
 vr = Uinf .* (1 - (a.^2) ./ (r.^2)).*cos(theta);
 vtheta = - Uinf .* (1 + (a.^2) ./ (r.^2)).*sin(theta);
